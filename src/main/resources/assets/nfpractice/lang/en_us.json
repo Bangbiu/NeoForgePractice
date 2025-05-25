@@ -1,4 +1,8 @@
 {
   "item_group.nfpractice": "NFPractice",
-  "item.nfpractice.medal": "Medal"
+  "item.nfpractice.medal": "Medal",
+  "item.nfpractice.super_credit": "Super Credit",
+
+  "block.nfpractice.super_credit_pile": "Super Credit Pile"
+
 }

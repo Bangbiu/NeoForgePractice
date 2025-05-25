@@ -1,5 +1,6 @@
 package com.empty.nfpractice;
 
+import com.empty.nfpractice.init.ModBlocks;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -40,6 +41,7 @@ public class NFPractice
 
         // Register the Deferred Register to the mod event bus so items get registered
         ModItems.register(modEventBus);
+        ModBlocks.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         ModCreativeTab.register(modEventBus);
 

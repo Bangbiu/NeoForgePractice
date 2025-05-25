@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "nfpractice:block/super_credit_pile_bottom",
+    "side": "nfpractice:block/super_credit_pile_side",
+    "top": "nfpractice:block/super_credit_pile_top"
+  }
+}

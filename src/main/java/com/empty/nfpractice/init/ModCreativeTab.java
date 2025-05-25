@@ -15,7 +15,9 @@ public class ModCreativeTab {
             .title(Component.translatable("item_group." + NFPractice.MOD_ID))
             .icon(() -> ModItems.MEDAL.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
-                output.accept(ModItems.MEDAL.get());
+                output.accept(ModItems.MEDAL);
+                output.accept(ModItems.SUPER_CREDIT);
+                output.accept(ModBlocks.SUPER_CREDIT_PILE);
             }).build());
 
     public static void register(IEventBus eventBus) {
