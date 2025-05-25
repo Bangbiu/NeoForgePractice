@@ -1,6 +1,8 @@
 package com.empty.nfpractice;
 
 import com.empty.nfpractice.init.ModBlocks;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -22,6 +24,7 @@ import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
 import com.empty.nfpractice.init.ModItems;
 import com.empty.nfpractice.init.ModCreativeTab;
+import com.empty.nfpractice.init.ModRecipeTypes;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(NFPractice.MOD_ID)
@@ -44,6 +47,7 @@ public class NFPractice
         ModBlocks.register(modEventBus);
         // Register the Deferred Register to the mod event bus so tabs get registered
         ModCreativeTab.register(modEventBus);
+        ModRecipeTypes.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
@@ -86,5 +90,9 @@ public class NFPractice
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
         }
+    }
+
+    public static @NotNull ResourceLocation of(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }
