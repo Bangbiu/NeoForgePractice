@@ -1,8 +1,12 @@
 {
   "item_group.nfpractice": "NFPractice",
+
+
+  "item.nfpractice.raw_caterium": "Raw Caterium",
+  "item.nfpractice.caterium_ingot": "Caterium Ingot",
+  "block.nfpractice.caterium_ore": "Caterium Ore",
+
   "item.nfpractice.medal": "Medal",
   "item.nfpractice.super_credit": "Super Credit",
-
   "block.nfpractice.super_credit_pile": "Super Credit Pile"
-
 }

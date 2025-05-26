@@ -18,6 +18,10 @@ public class ModCreativeTab {
                 output.accept(ModItems.MEDAL);
                 output.accept(ModItems.SUPER_CREDIT);
                 output.accept(ModBlocks.SUPER_CREDIT_PILE);
+
+                output.accept(ModBlocks.CATERIUM_ORE);
+                output.accept(ModItems.RAW_CATERIUM);
+                output.accept(ModItems.CATERIUM_INGOT);
             }).build());
 
     public static void register(IEventBus eventBus) {

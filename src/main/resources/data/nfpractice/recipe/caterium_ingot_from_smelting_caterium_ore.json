@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.7,
+  "group": "caterium_ingot",
+  "ingredient": {
+    "item": "nfpractice:caterium_ore"
+  },
+  "result": {
+    "id": "nfpractice:caterium_ingot"
+  }
+}
