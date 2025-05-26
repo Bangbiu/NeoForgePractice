@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_raw_caterium": {
+      "conditions": {
+        "items": [
+          {
+            "items": "nfpractice:raw_caterium"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "nfpractice:caterium_ingot_from_smelting_raw_caterium"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_raw_caterium"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "nfpractice:caterium_ingot_from_smelting_raw_caterium"
+    ]
+  }
+}

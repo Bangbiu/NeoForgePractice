@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_caterium_ore": {
+      "conditions": {
+        "items": [
+          {
+            "items": "nfpractice:caterium_ore"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "nfpractice:caterium_ingot_from_blasting_caterium_ore"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_caterium_ore"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "nfpractice:caterium_ingot_from_blasting_caterium_ore"
+    ]
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "nfpractice:caterium_ore"
+    }
+  ],
+  "result": {
+    "count": 18,
+    "id": "nfpractice:super_credit"
+  }
+}

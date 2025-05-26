@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "nfpractice:super_credit_pile"
+    }
+  ],
+  "result": {
+    "count": 9,
+    "id": "nfpractice:super_credit"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_super_credit_pile": {
+      "conditions": {
+        "items": [
+          {
+            "items": "nfpractice:super_credit_pile"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "nfpractice:super_credit"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_super_credit_pile"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "nfpractice:super_credit"
+    ]
+  }
+}
