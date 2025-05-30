@@ -2,6 +2,7 @@ package com.empty.nfpractice;
 
 import com.empty.nfpractice.init.ModBlocks;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -22,9 +23,11 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
+import com.empty.nfpractice.init.ModBlockEntities;
 import com.empty.nfpractice.init.ModItems;
 import com.empty.nfpractice.init.ModCreativeTab;
 import com.empty.nfpractice.init.ModRecipeTypes;
+import com.empty.nfpractice.block.entity.renderer.PedestalBlockEntityRenderer;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(NFPractice.MOD_ID)
@@ -48,6 +51,7 @@ public class NFPractice
         // Register the Deferred Register to the mod event bus so tabs get registered
         ModCreativeTab.register(modEventBus);
         ModRecipeTypes.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.
@@ -89,6 +93,11 @@ public class NFPractice
             // Some client setup code
             LOGGER.info("HELLO FROM CLIENT SETUP");
             LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        }
+        
+        @SubscribeEvent
+        public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
+            event.registerBlockEntityRenderer(ModBlockEntities.PEDESTAL_BE.get(), PedestalBlockEntityRenderer::new);
         }
     }
 

@@ -22,6 +22,9 @@ public class ModCreativeTab {
                 output.accept(ModBlocks.CATERIUM_ORE);
                 output.accept(ModItems.RAW_CATERIUM);
                 output.accept(ModItems.CATERIUM_INGOT);
+
+                output.accept(ModBlocks.CRAFT_BENCH);
+                output.accept(ModBlocks.PEDESTAL);
             }).build());
 
     public static void register(IEventBus eventBus) {

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "nfpractice:block/craft_bench"
+    },
+    "facing=south": {
+      "model": "nfpractice:block/craft_bench",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "nfpractice:block/craft_bench",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "nfpractice:block/craft_bench",
+      "y": 270
+    }
+  }
+}

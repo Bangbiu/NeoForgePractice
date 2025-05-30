@@ -1,3 +1,5 @@
-// 1.21.1	2025-05-26T16:05:37.7653503	Loot Tables
+// 1.21.1	2025-05-30T18:49:30.1621814	Loot Tables
 ab589617da85f8ca163aeca1881210c787fb70a4 data/nfpractice/loot_table/blocks/caterium_ore.json
+724194a8072f52605b2a6638860b8111a9a8727b data/nfpractice/loot_table/blocks/craft_bench.json
+e87e0355f18ef21db68532a8e6e70b702643eba1 data/nfpractice/loot_table/blocks/pedestal.json
 e135fa46ee94f6519df6dc8a76eda8c04b40af50 data/nfpractice/loot_table/blocks/super_credit_pile.json

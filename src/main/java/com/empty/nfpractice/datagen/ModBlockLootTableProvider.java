@@ -27,8 +27,8 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
     @Override
     protected void generate() {
         dropSelf(ModBlocks.SUPER_CREDIT_PILE.get());
-        // dropSelf(ModBlocks.MAGIC_BLOCK.get());
-
+        dropSelf(ModBlocks.PEDESTAL.get());
+        dropSelf(ModBlocks.CRAFT_BENCH.get());
         add(ModBlocks.CATERIUM_ORE.get(),
                 block -> createOreDrop(ModBlocks.CATERIUM_ORE.get(), ModItems.RAW_CATERIUM.get()));
         // add(ModBlocks.BISMUTH_DEEPSLATE_ORE.get(), block -> createMultipleOreDrops(ModBlocks.BISMUTH_DEEPSLATE_ORE.get(), ModItems.RAW_BISMUTH.get(), 2, 5));

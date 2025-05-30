@@ -1,6 +1,8 @@
 package com.empty.nfpractice.init;
 
 import com.empty.nfpractice.NFPractice;
+import com.empty.nfpractice.block.CraftBench;
+import com.empty.nfpractice.block.PedestalBlock;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -26,6 +28,11 @@ public class ModBlocks {
             () -> new DropExperienceBlock(UniformInt.of(2, 4),
                     BlockBehaviour.Properties.of().strength(3f).requiresCorrectToolForDrops().sound(SoundType.STONE)));
 
+    public static final DeferredBlock<Block> CRAFT_BENCH = registerBlock("craft_bench",
+            () -> new CraftBench(BlockBehaviour.Properties.of().noOcclusion()));
+
+    public static final DeferredBlock<Block> PEDESTAL = registerBlock("pedestal",
+            () -> new PedestalBlock());
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);
