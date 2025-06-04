@@ -29,7 +29,7 @@ public class ModBlocks {
                     BlockBehaviour.Properties.of().strength(3f).requiresCorrectToolForDrops().sound(SoundType.STONE)));
 
     public static final DeferredBlock<Block> CRAFT_BENCH = registerBlock("craft_bench",
-            () -> new CraftBench(BlockBehaviour.Properties.of().noOcclusion()));
+            () -> new CraftBench());
 
     public static final DeferredBlock<Block> PEDESTAL = registerBlock("pedestal",
             () -> new PedestalBlock());

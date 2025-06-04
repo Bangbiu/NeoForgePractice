@@ -1,6 +1,7 @@
 package com.empty.nfpractice.init;
 
 import com.empty.nfpractice.NFPractice;
+import com.empty.nfpractice.block.entity.CraftBenchEntity;
 import com.empty.nfpractice.block.entity.PedestalBlockEntity;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,6 +18,11 @@ public class ModBlockEntities {
     public static final Supplier<BlockEntityType<PedestalBlockEntity>> PEDESTAL_BE =
             BLOCK_ENTITIES.register("pedestal_be", () -> BlockEntityType.Builder.of(
                     PedestalBlockEntity::new, ModBlocks.PEDESTAL.get()).build(null));
+
+    public static final Supplier<BlockEntityType<CraftBenchEntity>> CRAFT_BENCH_BE =
+            BLOCK_ENTITIES.register("craft_bench_be", () -> BlockEntityType.Builder.of(
+                    CraftBenchEntity::new, ModBlocks.CRAFT_BENCH.get()).build(null));
+
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

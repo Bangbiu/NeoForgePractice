@@ -1,19 +1,10 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "nfpractice:block/craft_bench"
-    },
-    "facing=south": {
-      "model": "nfpractice:block/craft_bench",
-      "y": 180
-    },
-    "facing=east": {
-      "model": "nfpractice:block/craft_bench",
-      "y": 90
-    },
-    "facing=west": {
-      "model": "nfpractice:block/craft_bench",
-      "y": 270
-    }
+    "part=right": { "model": "nfpractice:block/empty" },
+    "facing=north,part=left": { "model": "nfpractice:block/craft_bench" },
+    "facing=east,part=left":  { "model": "nfpractice:block/craft_bench", "y": 90 },
+    "facing=south,part=left": { "model": "nfpractice:block/craft_bench", "y": 180 },
+    "facing=west,part=left":  { "model": "nfpractice:block/craft_bench", "y": 270 }
+
   }
 }

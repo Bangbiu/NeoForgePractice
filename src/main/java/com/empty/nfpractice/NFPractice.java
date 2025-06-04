@@ -1,8 +1,12 @@
 package com.empty.nfpractice;
 
+import com.empty.nfpractice.block.entity.CraftBenchEntity;
+import com.empty.nfpractice.block.entity.renderer.CraftBenchEntityRenderer;
 import com.empty.nfpractice.init.ModBlocks;
+import com.empty.nfpractice.util.ModModelLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -36,7 +40,7 @@ public class NFPractice
     // Define mod id in a common place for everything to reference
     public static final String MOD_ID = "nfpractice";
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
@@ -73,6 +77,7 @@ public class NFPractice
         LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
 
         Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
@@ -98,6 +103,12 @@ public class NFPractice
         @SubscribeEvent
         public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
             event.registerBlockEntityRenderer(ModBlockEntities.PEDESTAL_BE.get(), PedestalBlockEntityRenderer::new);
+            event.registerBlockEntityRenderer(ModBlockEntities.CRAFT_BENCH_BE.get(), CraftBenchEntityRenderer::new);
+        }
+
+        @SubscribeEvent
+        public static void onModelLoading(ModelEvent.RegisterGeometryLoaders event) {
+            //event.register("custom_geometry", new ModModelLoader());
         }
     }
 
