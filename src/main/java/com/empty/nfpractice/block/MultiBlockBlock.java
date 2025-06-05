@@ -1,6 +1,5 @@
 package com.empty.nfpractice.block;
 
-import com.mojang.datafixers.types.Func;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,7 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 
 public class MultiBlockBlock extends BaseEntityBlock {
-    public static final MapCodec<CraftBench> CODEC = simpleCodec(CraftBench::new);
+    public static final MapCodec<MultiBlockBlock> CODEC = simpleCodec(MultiBlockBlock::new);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final IntegerProperty OFFSET_X = IntegerProperty.create("offset_x_local", 0, 118);
     public static final IntegerProperty OFFSET_Y = IntegerProperty.create("offset_y_local", 0, 118);
@@ -52,6 +51,10 @@ public class MultiBlockBlock extends BaseEntityBlock {
                 .setValue(OFFSET_Z, localPos.getZ());
     }
 
+    public static boolean isMasterBlock(BlockState state) {
+        return MultiBlockBlock.getStateLocalPos(state).equals(MASTER_OFFSET);
+    }
+
     public MultiBlockBlock() {
         this(BlockBehaviour.Properties.of().strength(0.5f).noOcclusion());
     }
@@ -62,7 +65,7 @@ public class MultiBlockBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         BlockPos structPos = MultiBlockBlock.getStateLocalPos(state);
         return SHAPES.apply(structPos);
     }
@@ -89,10 +92,7 @@ public class MultiBlockBlock extends BaseEntityBlock {
             // Calculate World Position
             BlockPos worldCurPos = pos.offset(localCurPos.subtract(MASTER_OFFSET));
             // Check if all block pos is avaliable
-            if (!level.getBlockState(worldCurPos).canBeReplaced()) {
-                return false;
-            }
-            return true;
+            return level.getBlockState(worldCurPos).canBeReplaced();
         });
 
         if (placable) {
@@ -110,6 +110,9 @@ public class MultiBlockBlock extends BaseEntityBlock {
         SHAPES.eachOccupied((localCurPos) -> {
             // Calculate World Position
             BlockPos worldCurPos = pos.offset(localCurPos.subtract(MASTER_OFFSET));
+            if (localCurPos.equals(MASTER_OFFSET)) {
+                return true;
+            }
             // Place Dummy
             level.setBlock(worldCurPos, MultiBlockBlock.setStateLocalPos(state, localCurPos), 3);
             return true;
