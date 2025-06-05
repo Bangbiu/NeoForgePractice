@@ -5,6 +5,6 @@
 	"loader": "neoforge:obj",
 	"model": "nfpractice:models/block/craft_bench.obj",
 	"textures": {
-		"particle": "nfpractice:block/craft_bench"
+		"particle": "nfpractice:block/craft_bench_base"
 	}
 }

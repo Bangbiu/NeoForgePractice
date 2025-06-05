@@ -1,3 +1,8 @@
 # Made in Blockbench 4.12.4
-newmtl m_0ea0ce6f-13ec-693c-9cc7-0d6cf9e2d7df
-map_Kd nfpractice:block/craft_bench
+newmtl m_d6a8601a-e4c6-e17c-ebbb-c22129cf86e9
+map_Kd nfpractice:block/craft_bench_base
+newmtl m_eb372ea2-a16a-444f-b29a-6f1ad258fac0
+map_Kd nfpractice:block/craft_bench_table
+newmtl m_7798c4d1-6a1a-5f38-a4ae-bb2dda92b953
+map_Kd nfpractice:block/craft_bench_hang
+newmtl none

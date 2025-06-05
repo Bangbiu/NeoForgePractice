@@ -18,14 +18,6 @@ public class CraftBenchEntity extends BlockEntity {
         super(ModBlockEntities.CRAFT_BENCH_BE.get(), pos, blockState);
     }
 
-    public float getRenderingRotation() {
-        rotation += 0.5f;
-        if(rotation >= 360) {
-            rotation = 0;
-        }
-        return rotation;
-    }
-
     @Nullable
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {

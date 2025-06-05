@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class CraftBench extends BaseEntityBlock {
     public static final MapCodec<CraftBench> CODEC = simpleCodec(CraftBench::new);
-    public static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 16, 16);
+    public static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 3, 16);
 
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
