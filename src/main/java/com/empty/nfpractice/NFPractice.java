@@ -2,7 +2,7 @@ package com.empty.nfpractice;
 
 import com.empty.nfpractice.block.entity.CraftBenchEntity;
 import com.empty.nfpractice.block.entity.renderer.CraftBenchEntityRenderer;
-import com.empty.nfpractice.init.ModBlocks;
+import com.empty.nfpractice.init.*;
 import com.empty.nfpractice.util.ModModelLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -27,10 +27,6 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 
-import com.empty.nfpractice.init.ModBlockEntities;
-import com.empty.nfpractice.init.ModItems;
-import com.empty.nfpractice.init.ModCreativeTab;
-import com.empty.nfpractice.init.ModRecipeTypes;
 import com.empty.nfpractice.block.entity.renderer.PedestalBlockEntityRenderer;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -56,6 +52,7 @@ public class NFPractice
         ModCreativeTab.register(modEventBus);
         ModRecipeTypes.register(modEventBus);
         ModBlockEntities.register(modEventBus);
+        ModDataComponents.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (ExampleMod) to respond directly to events.

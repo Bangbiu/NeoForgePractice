@@ -3,6 +3,9 @@ package com.empty.nfpractice.init;
 import com.empty.nfpractice.NFPractice;
 import com.empty.nfpractice.block.CraftBench;
 import com.empty.nfpractice.block.PedestalBlock;
+import com.empty.nfpractice.block.multiblock.MultiBlockDummyBlock;
+import com.empty.nfpractice.block.multiblock.MultiBlockMasterBlock;
+import com.empty.nfpractice.block.multiblock.MultiBlockType;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -33,6 +36,13 @@ public class ModBlocks {
 
     public static final DeferredBlock<Block> PEDESTAL = registerBlock("pedestal",
             () -> new PedestalBlock());
+
+    public static final DeferredBlock<Block> MULTIBLOCK_MASTER = registerBlock("multiblock_master",
+            () -> new MultiBlockMasterBlock(MultiBlockType.createDefault()));
+
+    public static final DeferredBlock<Block> MULTIBLOCK_DUMMY = registerBlock("multiblock_dummy",
+            () -> new MultiBlockDummyBlock());
+
 
     private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> block) {
         DeferredBlock<T> toReturn = BLOCKS.register(name, block);

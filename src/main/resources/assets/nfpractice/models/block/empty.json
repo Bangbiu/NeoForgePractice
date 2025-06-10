@@ -1,7 +1,4 @@
 {
   "parent": "block/block",
-  "elements": [],
-  "textures": {
-    "particle": "nfpractice:block/craft_bench"
-  }
+  "elements": []
 }

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "nfpractice:block/pedestal" },
+    "facing=east":  { "model": "nfpractice:block/pedestal", "y": 90 },
+    "facing=south": { "model": "nfpractice:block/pedestal", "y": 180 },
+    "facing=west":  { "model": "nfpractice:block/pedestal", "y": 270 }
+  }
+}
