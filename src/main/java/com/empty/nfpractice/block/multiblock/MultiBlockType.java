@@ -1,20 +1,15 @@
 package com.empty.nfpractice.block.multiblock;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Function;
+import net.minecraft.core.Direction;
 
 public class MultiBlockType {
     public final StructShapes SHAPES;
-    public final BlockPos MASTER_OFFSET;
+    public final LocalBlockPos MASTER_OFFSET;
 
     private MultiBlockType() {
         this.SHAPES = new StructShapes();
-        this.MASTER_OFFSET = new BlockPos(0, 0, 1);
+        this.MASTER_OFFSET = new LocalBlockPos(1, 0, 1);
     }
 
     public static MultiBlockType createDefault() {
@@ -25,71 +20,13 @@ public class MultiBlockType {
         return new MultiBlockType();
     }
 
-    @NotNull
-    public boolean eachOccupied(Function<BlockPos, Boolean> func) {
-        for (int x = 0; x < this.SHAPES.BOUND.maxX(); x++) {
-            for (int y = 0; y < this.SHAPES.BOUND.maxY(); y++) {
-                for (int z = 0; z < this.SHAPES.BOUND.maxZ(); z++) {
-                    BlockPos pos = new BlockPos(x, y, z);
-                    if (this.SHAPES.occupied(pos)) {
-                        if (!func.apply(pos)) {
-                            return false;
-                        }
-                    }
-                }
-            }
-        }
-        return true;
+    public BlockPos getWorldPosFromMaster(BlockPos masterWorldPos, LocalBlockPos localPos, Direction facing) {
+        // Rotated Position According to Structure's FACING
+        LocalBlockPos rotatedLocalCurPos = localPos.faceTo(facing);
+        LocalBlockPos roatatedMasterOffset = this.MASTER_OFFSET.faceTo(facing);
+        // Master World Pos - Master Offset = Structure Origin World Pos
+        // Structure Origin World Pos + Local Pos(localCurPos) = World Pos
+        return masterWorldPos.subtract(roatatedMasterOffset).offset(rotatedLocalCurPos);
     }
 
-
-    public static class LocalBound extends BoundingBox {
-        public LocalBound() {
-            this(1, 1, 1);
-        }
-
-        public LocalBound(BlockPos pos) {
-            this(pos.getX(), pos.getY(), pos.getZ());
-        }
-
-        public LocalBound(int maxX, int maxY, int maxZ) {
-            super(0, 0, 0, maxX, maxY, maxZ);
-        }
-
-        @Override
-        public int minX() {
-            return 0;
-        }
-
-        @Override
-        public int minY() {
-            return 0;
-        }
-
-        @Override
-        public int minZ() {
-            return 0;
-        }
-    }
-
-    public static class StructShapes implements Function<BlockPos, VoxelShape> {
-        public final LocalBound BOUND = new LocalBound(2, 2, 2);
-
-        @Override
-        public VoxelShape apply(BlockPos blockPos) {
-            if (!this.occupied(blockPos)) {
-                return Shapes.box(1,1,1,8,8,8);
-            }
-            return Shapes.block();
-        }
-
-        @NotNull
-        public boolean occupied(BlockPos blockPos) {
-            if (!BOUND.isInside(blockPos)) {
-                return false;
-            }
-            // Rules
-            return true;
-        }
-    }
 }

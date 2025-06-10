@@ -1,6 +1,7 @@
 package com.empty.nfpractice.block.entity;
 
 import com.empty.nfpractice.NFPractice;
+import com.empty.nfpractice.block.multiblock.LocalBlockPos;
 import com.empty.nfpractice.block.multiblock.MultiBlockMasterBlock;
 import com.empty.nfpractice.block.multiblock.MultiBlockType;
 import com.empty.nfpractice.init.ModBlockEntities;
@@ -37,47 +38,24 @@ public class MultiBlockMasterEntity extends BlockEntity {
         return saveWithoutMetadata(pRegistries);
     }
 
-    public BlockPos turnToMasterDir(BlockPos localPos) {
+    public BlockPos getWorldPosFromMaster(BlockPos masterWorldPos, LocalBlockPos localPos) {
         Direction dir = this.getBlockState().getValue(MultiBlockMasterBlock.FACING);
-
-        int x = localPos.getX();
-        int y = localPos.getY();
-        int z = localPos.getZ();
-
-        switch (dir) {
-            case EAST:
-                return new BlockPos(-z, y, x); // 90 degrees CW
-            case SOUTH:
-                return new BlockPos(-x, y, -z); // 180 degrees
-            case WEST:
-                return new BlockPos(z, y, -x); // 270 degrees CW
-            default:
-                return localPos; // no rotation
-        }
-    }
-
-    public BlockPos getDummyWorldPosFromMaster(BlockPos masterWorldPos, BlockPos localPos) {
-        // Rotated Position According to Structure's FACING
-        BlockPos rotatedLocalCurPos = this.turnToMasterDir(localPos);
-        BlockPos roatatedMasterOffset = this.turnToMasterDir(TYPE.MASTER_OFFSET);
-        // Master World Pos - Master Offset = Structure Origin World Pos
-        // Structure Origin World Pos + Dummy Local Pos(localCurPos) = Dummy World Pos
-        return masterWorldPos.subtract(roatatedMasterOffset).offset(rotatedLocalCurPos);
+        return TYPE.getWorldPosFromMaster(masterWorldPos, localPos, dir);
     }
 
     @NotNull
-    public VoxelShape getDummyShape(BlockPos localPos) {
-        return this.TYPE.SHAPES.apply(localPos);
+    public VoxelShape getDummyShape(LocalBlockPos localPos) {
+        return this.TYPE.SHAPES.shapeAt(localPos);
     }
 
     public void createStructure() {
         BlockPos masterWorldPos = getBlockPos();
         NFPractice.LOGGER.info("Master At: {}", masterWorldPos);
-        TYPE.eachOccupied((localCurPos) -> {
-            BlockPos worldCurPos = this.getDummyWorldPosFromMaster(masterWorldPos, localCurPos);
+        for (LocalBlockPos localCurPos : TYPE.SHAPES) {
+            BlockPos worldCurPos = this.getWorldPosFromMaster(masterWorldPos, localCurPos);
             if (worldCurPos.equals(masterWorldPos)) {
                 // At Master Position -> Skip
-                return true;
+                continue;
             }
             // Place Dummy
             level.setBlock(worldCurPos, ModBlocks.MULTIBLOCK_DUMMY.get().defaultBlockState(), 3);
@@ -86,25 +64,23 @@ public class MultiBlockMasterEntity extends BlockEntity {
             if (be instanceof MultiBlockDummyEntity dummy) {
                 dummy.config(masterWorldPos, localCurPos);
             }
-            return true;
-        });
+        }
     }
 
     public void removeStructure() {
         BlockPos masterWorldPos = this.getBlockPos();
-        TYPE.eachOccupied((localCurPos) -> {
-            BlockPos worldCurPos = this.getDummyWorldPosFromMaster(masterWorldPos, localCurPos);
+        for (LocalBlockPos localCurPos : TYPE.SHAPES) {
+            BlockPos worldCurPos = this.getWorldPosFromMaster(masterWorldPos, localCurPos);
             if (worldCurPos.equals(masterWorldPos)) {
                 // At Master Position -> Skip
-                return true;
+                continue;
             }
 
             // Remove Dummy
             if (level.getBlockState(worldCurPos).getBlock() == ModBlocks.MULTIBLOCK_DUMMY.get()) {
                 level.removeBlock(worldCurPos, false);
             }
-            return true;
-        });
+        };
         // Remove Master
         level.removeBlock(masterWorldPos, false);
     }

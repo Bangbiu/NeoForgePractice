@@ -1,5 +1,6 @@
 package com.empty.nfpractice.block.entity;
 
+import com.empty.nfpractice.block.multiblock.LocalBlockPos;
 import com.empty.nfpractice.init.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MultiBlockDummyEntity extends BlockEntity {
     private BlockPos masterPos;
-    private BlockPos localPos;
+    private LocalBlockPos localPos;
 
     public MultiBlockDummyEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.MULTIBLOCK_DUMMY_BE.get(), pos, blockState);
@@ -46,11 +47,11 @@ public class MultiBlockDummyEntity extends BlockEntity {
         return localPos;
     }
 
-    public void setLocalPos(BlockPos localPos) {
+    public void setLocalPos(LocalBlockPos localPos) {
         this.localPos = localPos;
     }
 
-    public void config(BlockPos masterPos, BlockPos localPos) {
+    public void config(BlockPos masterPos, LocalBlockPos localPos) {
         this.localPos = localPos;
         this.masterPos = masterPos;
     }
@@ -92,7 +93,7 @@ public class MultiBlockDummyEntity extends BlockEntity {
             masterPos = BlockPos.of(tag.getLong("MasterPos"));
         }
         if (tag.contains("LocalPos")) {
-            localPos = BlockPos.of(tag.getLong("LocalPos"));
+            localPos = LocalBlockPos.of(BlockPos.of(tag.getLong("LocalPos")));
         }
     }
 }

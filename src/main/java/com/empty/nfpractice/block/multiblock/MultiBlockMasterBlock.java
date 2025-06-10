@@ -50,18 +50,19 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         Direction dir = ctx.getHorizontalDirection().getOpposite();
-        BlockPos pos = ctx.getClickedPos();
+        BlockPos masterWorldPos = ctx.getClickedPos();
         Level level = ctx.getLevel();
 
         // This block is Master Block at MASTER OFFSET
-        boolean placable = TYPE.eachOccupiedFromMaster((localCurPos) -> {
-            // Calculate World Position
-            BlockPos worldCurPos = pos.offset(localCurPos);
+        for (LocalBlockPos localCurPos : TYPE.SHAPES) {
+            BlockPos worldCurPos = TYPE.getWorldPosFromMaster(masterWorldPos, localCurPos, dir);
             // Check if all block pos is avaliable
-            return level.getBlockState(worldCurPos).canBeReplaced();
-        });
+            if (!level.getBlockState(worldCurPos).canBeReplaced()) {
+                return null;
+            }
+        }
 
-        return placable ? this.getMasterBlockState(dir) : null;
+        return this.getMasterBlockState(dir);
     }
 
     @Override
