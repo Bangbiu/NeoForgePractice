@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class MultiBlockDummyEntity extends BlockEntity {
     private BlockPos masterPos;
+    private BlockPos localPos;
 
     public MultiBlockDummyEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.MULTIBLOCK_DUMMY_BE.get(), pos, blockState);
@@ -37,18 +38,31 @@ public class MultiBlockDummyEntity extends BlockEntity {
         return masterPos;
     }
 
-    public void setMasterPos(BlockPos pos) {
-        this.masterPos = pos;
+    public void setMasterPos(BlockPos masterPos) {
+        this.masterPos = masterPos;
+    }
+
+    public BlockPos getLocalPos() {
+        return localPos;
+    }
+
+    public void setLocalPos(BlockPos localPos) {
+        this.localPos = localPos;
+    }
+
+    public void config(BlockPos masterPos, BlockPos localPos) {
+        this.localPos = localPos;
+        this.masterPos = masterPos;
     }
 
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (masterPos != null) {
             if (level.getBlockEntity(masterPos) instanceof MultiBlockMasterEntity entity) {
-                return entity.getDummyShape(pos);
+                return entity.getDummyShape(localPos);
             }
         }
 
-        return Shapes.block();
+        return Shapes.empty();
     }
 
     public void removeStructure() {
@@ -65,6 +79,10 @@ public class MultiBlockDummyEntity extends BlockEntity {
         if (masterPos != null) {
             tag.putLong("MasterPos", masterPos.asLong());
         }
+
+        if (localPos != null) {
+            tag.putLong("LocalPos", localPos.asLong());
+        }
     }
 
     @Override
@@ -73,6 +91,8 @@ public class MultiBlockDummyEntity extends BlockEntity {
         if (tag.contains("MasterPos")) {
             masterPos = BlockPos.of(tag.getLong("MasterPos"));
         }
-
+        if (tag.contains("LocalPos")) {
+            localPos = BlockPos.of(tag.getLong("LocalPos"));
+        }
     }
 }

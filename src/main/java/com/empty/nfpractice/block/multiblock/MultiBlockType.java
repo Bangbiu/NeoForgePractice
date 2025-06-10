@@ -1,7 +1,6 @@
 package com.empty.nfpractice.block.multiblock;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -15,7 +14,7 @@ public class MultiBlockType {
 
     private MultiBlockType() {
         this.SHAPES = new StructShapes();
-        this.MASTER_OFFSET = new BlockPos(0, 0, 0);
+        this.MASTER_OFFSET = new BlockPos(0, 0, 1);
     }
 
     public static MultiBlockType createDefault() {
@@ -24,11 +23,6 @@ public class MultiBlockType {
 
     public static MultiBlockType create() {
         return new MultiBlockType();
-    }
-
-    @NotNull
-    public boolean eachOccupiedFromMaster(Function<BlockPos, Boolean> func) {
-        return this.eachOccupied(blockPos -> func.apply(blockPos.subtract(MASTER_OFFSET)));
     }
 
     @NotNull
@@ -79,12 +73,12 @@ public class MultiBlockType {
     }
 
     public static class StructShapes implements Function<BlockPos, VoxelShape> {
-        public final LocalBound BOUND = new LocalBound(2, 2, 2);;
+        public final LocalBound BOUND = new LocalBound(2, 2, 2);
 
         @Override
         public VoxelShape apply(BlockPos blockPos) {
             if (!this.occupied(blockPos)) {
-                return null;
+                return Shapes.box(1,1,1,8,8,8);
             }
             return Shapes.block();
         }
