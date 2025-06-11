@@ -52,6 +52,7 @@ public class NFPractice
         ModCreativeTab.register(modEventBus);
         ModRecipeTypes.register(modEventBus);
         ModBlockEntities.register(modEventBus);
+        ModMultiBlock.register(modEventBus);
         ModDataComponents.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.

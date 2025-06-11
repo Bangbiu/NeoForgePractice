@@ -26,7 +26,7 @@ public class ModCreativeTab {
                 output.accept(ModBlocks.CRAFT_BENCH);
                 output.accept(ModBlocks.PEDESTAL);
 
-                output.accept(ModBlocks.MULTIBLOCK_MASTER);
+                output.accept(ModMultiBlock.MULTIBLOCK_MASTER);
             }).build());
 
     public static void register(IEventBus eventBus) {

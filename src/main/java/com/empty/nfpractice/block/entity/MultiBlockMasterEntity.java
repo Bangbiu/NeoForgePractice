@@ -6,6 +6,7 @@ import com.empty.nfpractice.block.multiblock.MultiBlockMasterBlock;
 import com.empty.nfpractice.block.multiblock.MultiBlockType;
 import com.empty.nfpractice.init.ModBlockEntities;
 import com.empty.nfpractice.init.ModBlocks;
+import com.empty.nfpractice.init.ModMultiBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -50,7 +51,6 @@ public class MultiBlockMasterEntity extends BlockEntity {
 
     public void createStructure() {
         BlockPos masterWorldPos = getBlockPos();
-        NFPractice.LOGGER.info("Master At: {}", masterWorldPos);
         for (LocalBlockPos localCurPos : TYPE.SHAPES) {
             BlockPos worldCurPos = this.getWorldPosFromMaster(masterWorldPos, localCurPos);
             if (worldCurPos.equals(masterWorldPos)) {
@@ -58,8 +58,7 @@ public class MultiBlockMasterEntity extends BlockEntity {
                 continue;
             }
             // Place Dummy
-            level.setBlock(worldCurPos, ModBlocks.MULTIBLOCK_DUMMY.get().defaultBlockState(), 3);
-            NFPractice.LOGGER.info("Dummy At: {}", worldCurPos);
+            level.setBlock(worldCurPos, ModMultiBlock.MULTIBLOCK_DUMMY.get().defaultBlockState(), 3);
             BlockEntity be = level.getBlockEntity(worldCurPos);
             if (be instanceof MultiBlockDummyEntity dummy) {
                 dummy.config(masterWorldPos, localCurPos);
@@ -77,7 +76,7 @@ public class MultiBlockMasterEntity extends BlockEntity {
             }
 
             // Remove Dummy
-            if (level.getBlockState(worldCurPos).getBlock() == ModBlocks.MULTIBLOCK_DUMMY.get()) {
+            if (level.getBlockState(worldCurPos).getBlock() == ModMultiBlock.MULTIBLOCK_DUMMY.get()) {
                 level.removeBlock(worldCurPos, false);
             }
         };

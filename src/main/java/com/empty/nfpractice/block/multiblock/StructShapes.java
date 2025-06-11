@@ -1,9 +1,9 @@
 package com.empty.nfpractice.block.multiblock;
 
+import com.empty.nfpractice.NFPractice;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -12,7 +12,8 @@ public class StructShapes implements Iterable<LocalBlockPos> {
     public final LocalBound BOUNDARY;
 
     public StructShapes() {
-        this.BOUNDARY = new LocalBound(2, 1, 2);
+        //NFPractice.LOGGER.debug("\n\nBOUND: {}\n", this.bounds());
+        this.BOUNDARY = new LocalBound(3, 1, 3);
     }
 
     public VoxelShape shapeAt(LocalBlockPos blockPos) {
@@ -39,7 +40,7 @@ public class StructShapes implements Iterable<LocalBlockPos> {
     public @NotNull Iterator<LocalBlockPos> iterator() {
         return new ShapeBlockIterator();
     }
-    
+
     public class ShapeBlockIterator implements Iterator<LocalBlockPos> {
         int nextX = 0, nextY = 0, nextZ = -1;
 

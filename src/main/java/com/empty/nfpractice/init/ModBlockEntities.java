@@ -29,11 +29,11 @@ public class ModBlockEntities {
     public static final Supplier<BlockEntityType<MultiBlockMasterEntity>> MULTIBLOCK_MASTER_BE =
             BLOCK_ENTITIES.register("multiblock_master_be", () -> BlockEntityType.Builder.of(
                     (pos, state)-> new MultiBlockMasterEntity(pos, state, MultiBlockType.createDefault()),
-                    ModBlocks.MULTIBLOCK_MASTER.get()).build(null));
+                    ModMultiBlock.MULTIBLOCK_MASTER.get()).build(null));
 
     public static final Supplier<BlockEntityType<MultiBlockDummyEntity>> MULTIBLOCK_DUMMY_BE =
             BLOCK_ENTITIES.register("multiblock_dummy_be", () -> BlockEntityType.Builder.of(
-                    MultiBlockDummyEntity::new, ModBlocks.MULTIBLOCK_DUMMY.get()).build(null));
+                    MultiBlockDummyEntity::new, ModMultiBlock.MULTIBLOCK_DUMMY.get()).build(null));
 
 
     public static void register(IEventBus eventBus) {
