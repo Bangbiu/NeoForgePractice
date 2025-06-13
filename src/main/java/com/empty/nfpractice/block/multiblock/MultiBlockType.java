@@ -9,7 +9,7 @@ public class MultiBlockType {
 
     private MultiBlockType() {
         this.SHAPES = new StructShapes();
-        this.MASTER_OFFSET = new LocalBlockPos(1, 0, 1);
+        this.MASTER_OFFSET = new LocalBlockPos(0, 0, 0);
     }
 
     public static MultiBlockType createDefault() {

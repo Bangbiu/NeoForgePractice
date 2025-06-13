@@ -1,9 +1,7 @@
 package com.empty.nfpractice;
 
-import com.empty.nfpractice.block.entity.CraftBenchEntity;
 import com.empty.nfpractice.block.entity.renderer.CraftBenchEntityRenderer;
 import com.empty.nfpractice.init.*;
-import com.empty.nfpractice.util.ModModelLoader;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;

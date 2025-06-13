@@ -13,7 +13,7 @@ public class StructShapes implements Iterable<LocalBlockPos> {
 
     public StructShapes() {
         //NFPractice.LOGGER.debug("\n\nBOUND: {}\n", this.bounds());
-        this.BOUNDARY = new LocalBound(3, 1, 3);
+        this.BOUNDARY = new LocalBound(2, 2, 2);
     }
 
     public VoxelShape shapeAt(LocalBlockPos blockPos) {

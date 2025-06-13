@@ -1,11 +1,9 @@
 package com.empty.nfpractice.block.entity;
 
-import com.empty.nfpractice.NFPractice;
 import com.empty.nfpractice.block.multiblock.LocalBlockPos;
 import com.empty.nfpractice.block.multiblock.MultiBlockMasterBlock;
 import com.empty.nfpractice.block.multiblock.MultiBlockType;
 import com.empty.nfpractice.init.ModBlockEntities;
-import com.empty.nfpractice.init.ModBlocks;
 import com.empty.nfpractice.init.ModMultiBlock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -45,7 +43,7 @@ public class MultiBlockMasterEntity extends BlockEntity {
     }
 
     @NotNull
-    public VoxelShape getDummyShape(LocalBlockPos localPos) {
+    public VoxelShape getBlockShape(LocalBlockPos localPos) {
         return this.TYPE.SHAPES.shapeAt(localPos);
     }
 
