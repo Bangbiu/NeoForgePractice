@@ -5,6 +5,7 @@ import com.empty.nfpractice.init.*;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -105,6 +106,11 @@ public class NFPractice
         @SubscribeEvent
         public static void onModelLoading(ModelEvent.RegisterGeometryLoaders event) {
             //event.register("custom_geometry", new ModModelLoader());
+        }
+
+        @SubscribeEvent
+        public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
+            //event.registerReloadListener(new ModDataLoaders.MultiBlockTypeLoader());
         }
     }
 

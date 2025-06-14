@@ -23,15 +23,17 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Supplier;
+
 public class MultiBlockMasterBlock extends BaseEntityBlock {
-    private final MultiBlockType TYPE;
+    private final Supplier<MultiBlockType> TYPE;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public MultiBlockMasterBlock(MultiBlockType type) {
+    public MultiBlockMasterBlock(Supplier<MultiBlockType> type) {
         this(type, Properties.of().strength(0.5f).noOcclusion());
     }
 
-    public MultiBlockMasterBlock(MultiBlockType type, Properties properties) {
+    public MultiBlockMasterBlock(Supplier<MultiBlockType> type, Properties properties) {
         super(properties);
         this.TYPE = type;
         this.registerDefaultState(this.stateDefinition.any()
@@ -46,19 +48,20 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new MultiBlockMasterEntity(pos, state, this.TYPE);
+        return new MultiBlockMasterEntity(pos, state, this.getType());
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        MultiBlockType type = this.getType();
         Direction dir = ctx.getHorizontalDirection().getOpposite();
         BlockPos masterWorldPos = ctx.getClickedPos();
         Level level = ctx.getLevel();
 
         // This block is Master Block at MASTER OFFSET
-        for (LocalBlockPos localCurPos : TYPE.SHAPES) {
-            BlockPos worldCurPos = TYPE.getWorldPosFromMaster(masterWorldPos, localCurPos, dir);
+        for (LocalBlockPos localCurPos : type.SHAPES) {
+            BlockPos worldCurPos = type.getWorldPosFromMaster(masterWorldPos, localCurPos, dir);
             // Check if all block pos is avaliable
             if (!level.getBlockState(worldCurPos).canBeReplaced()) {
                 return null;
@@ -103,6 +106,10 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
+    }
+
+    public MultiBlockType getType() {
+        return this.TYPE.get();
     }
 
     public BlockState getMasterBlockState(Direction facing) {

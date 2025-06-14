@@ -1,0 +1,10 @@
+{
+  "name": "test_multiblock",
+  "master": [1, 0, 1],
+  "shape": [
+      {
+        "from": [7, 0, 17],
+        "to": [14, 16, 31]
+      }
+    ]
+}
