@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "nfpractice:block/test_voxel" },
+    "facing=east":  { "model": "nfpractice:block/test_voxel", "y": 90 },
+    "facing=south": { "model": "nfpractice:block/test_voxel", "y": 180 },
+    "facing=west":  { "model": "nfpractice:block/test_voxel", "y": 270 }
+  }
+}

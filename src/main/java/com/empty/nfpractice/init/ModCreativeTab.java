@@ -27,6 +27,7 @@ public class ModCreativeTab {
                 output.accept(ModBlocks.PEDESTAL);
 
                 output.accept(ModMultiBlock.MULTIBLOCK_MASTER);
+                output.accept(ModMultiBlock.TEST_MULTIBLOCK);
             }).build());
 
     public static void register(IEventBus eventBus) {

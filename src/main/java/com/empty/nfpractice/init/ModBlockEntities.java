@@ -26,15 +26,16 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("craft_bench_be", () -> BlockEntityType.Builder.of(
                     CraftBenchEntity::new, ModBlocks.CRAFT_BENCH.get()).build(null));
 
-    public static final Supplier<BlockEntityType<MultiBlockMasterEntity>> MULTIBLOCK_MASTER_BE =
-            BLOCK_ENTITIES.register("multiblock_master_be", () -> BlockEntityType.Builder.of(
-                    (pos, state)-> new MultiBlockMasterEntity(pos, state, MultiBlockType.createDefault()),
-                    ModMultiBlock.MULTIBLOCK_MASTER.get()).build(null));
-
     public static final Supplier<BlockEntityType<MultiBlockDummyEntity>> MULTIBLOCK_DUMMY_BE =
             BLOCK_ENTITIES.register("multiblock_dummy_be", () -> BlockEntityType.Builder.of(
                     MultiBlockDummyEntity::new, ModMultiBlock.MULTIBLOCK_DUMMY.get()).build(null));
 
+    public static final Supplier<BlockEntityType<MultiBlockMasterEntity>> MULTIBLOCK_MASTER_BE =
+            BLOCK_ENTITIES.register("multiblock_master_be", () -> BlockEntityType.Builder.of(
+                    MultiBlockMasterEntity::new,
+                    ModMultiBlock.MULTIBLOCK_MASTER.get(),
+                    ModMultiBlock.TEST_MULTIBLOCK.get()
+            ).build(null));
 
     public static void register(IEventBus eventBus) {
         BLOCK_ENTITIES.register(eventBus);

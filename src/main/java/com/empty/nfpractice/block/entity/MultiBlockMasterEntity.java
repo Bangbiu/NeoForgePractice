@@ -19,12 +19,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MultiBlockMasterEntity extends BlockEntity {
-    private final MultiBlockType TYPE;
+    private MultiBlockType multiBlockType;
 
-    public MultiBlockMasterEntity(BlockPos pos, BlockState blockState, MultiBlockType type) {
+    public MultiBlockMasterEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.MULTIBLOCK_MASTER_BE.get(), pos, blockState);
-        this.TYPE = type;
+        this.multiBlockType = MultiBlockType.DEFAULT;
     }
+
+    public MultiBlockType getMultiBlockType() {
+        return multiBlockType;
+    }
+
+    public void setMultiBlockType(MultiBlockType multiBlockType) {
+        this.multiBlockType = multiBlockType;
+    }
+
 
     @Nullable
     @Override
@@ -39,17 +48,17 @@ public class MultiBlockMasterEntity extends BlockEntity {
 
     public BlockPos getWorldPosFromMaster(BlockPos masterWorldPos, LocalBlockPos localPos) {
         Direction dir = this.getBlockState().getValue(MultiBlockMasterBlock.FACING);
-        return TYPE.getWorldPosFromMaster(masterWorldPos, localPos, dir);
+        return this.multiBlockType.getWorldPosFromMaster(masterWorldPos, localPos, dir);
     }
 
     @NotNull
     public VoxelShape getBlockShape(LocalBlockPos localPos) {
-        return this.TYPE.SHAPES.shapeAt(localPos);
+        return this.multiBlockType.SHAPES.shapeAt(localPos);
     }
 
     public void createStructure() {
         BlockPos masterWorldPos = getBlockPos();
-        for (LocalBlockPos localCurPos : TYPE.SHAPES) {
+        for (LocalBlockPos localCurPos : this.multiBlockType.SHAPES) {
             BlockPos worldCurPos = this.getWorldPosFromMaster(masterWorldPos, localCurPos);
             if (worldCurPos.equals(masterWorldPos)) {
                 // At Master Position -> Skip
@@ -66,7 +75,7 @@ public class MultiBlockMasterEntity extends BlockEntity {
 
     public void removeStructure() {
         BlockPos masterWorldPos = this.getBlockPos();
-        for (LocalBlockPos localCurPos : TYPE.SHAPES) {
+        for (LocalBlockPos localCurPos : this.multiBlockType.SHAPES) {
             BlockPos worldCurPos = this.getWorldPosFromMaster(masterWorldPos, localCurPos);
             if (worldCurPos.equals(masterWorldPos)) {
                 // At Master Position -> Skip
@@ -81,4 +90,5 @@ public class MultiBlockMasterEntity extends BlockEntity {
         // Remove Master
         level.removeBlock(masterWorldPos, false);
     }
+
 }

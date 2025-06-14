@@ -20,9 +20,11 @@ public class ModMultiBlock {
     public static final DeferredBlock<Block> MULTIBLOCK_DUMMY = registerBlock("multiblock_dummy",
             () -> new MultiBlockDummyBlock());
 
-    public static final DeferredBlock<MultiBlockMasterBlock> MULTIBLOCK_MASTER = registerMultiBlock("multiblock_master");
+    public static final DeferredBlock<Block> MULTIBLOCK_MASTER = registerMultiBlock("multiblock_master");
 
-    private static DeferredBlock<MultiBlockMasterBlock> registerMultiBlock(String name) {
+    public static final DeferredBlock<Block> TEST_MULTIBLOCK = registerMultiBlock("test_multiblock");
+
+    private static DeferredBlock<Block> registerMultiBlock(String name) {
         return registerBlock(name, () -> new MultiBlockMasterBlock(name));
     }
 
