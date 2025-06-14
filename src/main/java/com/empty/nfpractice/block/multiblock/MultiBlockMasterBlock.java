@@ -1,8 +1,6 @@
 package com.empty.nfpractice.block.multiblock;
 
-import com.empty.nfpractice.block.entity.MultiBlockDummyEntity;
 import com.empty.nfpractice.block.entity.MultiBlockMasterEntity;
-import com.empty.nfpractice.init.ModBlocks;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,19 +21,17 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Supplier;
-
 public class MultiBlockMasterBlock extends BaseEntityBlock {
-    private final Supplier<MultiBlockType> TYPE;
+    private final String TYPE_ID;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public MultiBlockMasterBlock(Supplier<MultiBlockType> type) {
-        this(type, Properties.of().strength(0.5f).noOcclusion());
+    public MultiBlockMasterBlock(String typeID) {
+        this(typeID, Properties.of().strength(0.5f).noOcclusion());
     }
 
-    public MultiBlockMasterBlock(Supplier<MultiBlockType> type, Properties properties) {
+    public MultiBlockMasterBlock(String typeID, Properties properties) {
         super(properties);
-        this.TYPE = type;
+        this.TYPE_ID = typeID;
         this.registerDefaultState(this.stateDefinition.any()
                 .setValue(FACING, Direction.NORTH));
     }
@@ -43,7 +39,7 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
         return simpleCodec((properties) ->
-                (new MultiBlockMasterBlock(this.TYPE)));
+                (new MultiBlockMasterBlock(this.TYPE_ID)));
     }
 
     @Override
@@ -109,7 +105,7 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
     }
 
     public MultiBlockType getType() {
-        return this.TYPE.get();
+        return MultiBlockType.TYPES.getOrDefault(this.TYPE_ID, MultiBlockType.DEFAULT);
     }
 
     public BlockState getMasterBlockState(Direction facing) {

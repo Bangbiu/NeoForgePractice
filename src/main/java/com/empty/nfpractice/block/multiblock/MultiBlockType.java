@@ -1,8 +1,11 @@
 package com.empty.nfpractice.block.multiblock;
 
+import com.empty.nfpractice.NFPractice;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.Map;
 
 public class MultiBlockType {
 
@@ -30,6 +33,9 @@ public class MultiBlockType {
         // Structure Origin World Pos + Local Pos(localCurPos) = World Pos
         return masterWorldPos.subtract(roatatedMasterOffset).offset(rotatedLocalCurPos);
     }
+
+    public static final Map<String, MultiBlockType> TYPES =
+            Map.of("multiblock_master",  MultiBlockType.createDefault());
 
     public static MultiBlockType DEFAULT = MultiBlockType.createDefault();
 

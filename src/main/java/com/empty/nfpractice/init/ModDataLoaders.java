@@ -1,6 +1,7 @@
 package com.empty.nfpractice.init;
 
 import com.empty.nfpractice.NFPractice;
+import com.empty.nfpractice.block.multiblock.MultiBlockType;
 import com.google.gson.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -29,7 +30,7 @@ public class ModDataLoaders {
 
         @Override
         protected void apply(Map<ResourceLocation, JsonElement> objectMap, ResourceManager resourceManager, ProfilerFiller profiler) {
-            ModMultiBlock.TYPES.clear();
+            MultiBlockType.TYPES.clear();
 
             for (Map.Entry<ResourceLocation, JsonElement> entry : objectMap.entrySet()) {
                 ResourceLocation id = entry.getKey();
