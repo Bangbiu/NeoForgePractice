@@ -110,7 +110,7 @@ public class NFPractice
 
         @SubscribeEvent
         public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
-            //event.registerReloadListener(new ModDataLoaders.MultiBlockTypeLoader());
+            event.registerReloadListener(new ModDataLoaders.MultiBlockTypeLoader());
         }
     }
 

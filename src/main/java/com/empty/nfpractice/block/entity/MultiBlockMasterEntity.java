@@ -19,19 +19,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MultiBlockMasterEntity extends BlockEntity {
-    private MultiBlockType multiBlockType;
+    private String TYPE_ID;
 
     public MultiBlockMasterEntity(BlockPos pos, BlockState blockState) {
         super(ModBlockEntities.MULTIBLOCK_MASTER_BE.get(), pos, blockState);
-        this.multiBlockType = MultiBlockType.DEFAULT;
+        this.TYPE_ID = MultiBlockType.DEFAULT_ID;
     }
 
-    public MultiBlockType getMultiBlockType() {
-        return multiBlockType;
+    public String getTypeID() {
+        return TYPE_ID;
     }
 
-    public void setMultiBlockType(MultiBlockType multiBlockType) {
-        this.multiBlockType = multiBlockType;
+    public void setTypeID(String TYPE_ID) {
+        this.TYPE_ID = TYPE_ID;
     }
 
 
@@ -46,19 +46,40 @@ public class MultiBlockMasterEntity extends BlockEntity {
         return saveWithoutMetadata(pRegistries);
     }
 
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
+        if (TYPE_ID != null) {
+            tag.putString("type_id", this.TYPE_ID);
+        }
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
+        if (tag.contains("type_id")) {
+            this.TYPE_ID = tag.getString("type_id");
+        }
+    }
+
     public BlockPos getWorldPosFromMaster(BlockPos masterWorldPos, LocalBlockPos localPos) {
         Direction dir = this.getBlockState().getValue(MultiBlockMasterBlock.FACING);
-        return this.multiBlockType.getWorldPosFromMaster(masterWorldPos, localPos, dir);
+        return this.getMultiBlockType().getWorldPosFromMaster(masterWorldPos, localPos, dir);
     }
 
     @NotNull
     public VoxelShape getBlockShape(LocalBlockPos localPos) {
-        return this.multiBlockType.SHAPES.shapeAt(localPos);
+        return this.getMultiBlockType().SHAPES.shapeAt(localPos);
+    }
+
+    public MultiBlockType getMultiBlockType() {
+        return MultiBlockType.TYPES.getOrDefault(this.TYPE_ID, MultiBlockType.DEFAULT);
     }
 
     public void createStructure() {
         BlockPos masterWorldPos = getBlockPos();
-        for (LocalBlockPos localCurPos : this.multiBlockType.SHAPES) {
+        MultiBlockType type = this.getMultiBlockType();
+        for (LocalBlockPos localCurPos : type.SHAPES) {
             BlockPos worldCurPos = this.getWorldPosFromMaster(masterWorldPos, localCurPos);
             if (worldCurPos.equals(masterWorldPos)) {
                 // At Master Position -> Skip
@@ -75,7 +96,8 @@ public class MultiBlockMasterEntity extends BlockEntity {
 
     public void removeStructure() {
         BlockPos masterWorldPos = this.getBlockPos();
-        for (LocalBlockPos localCurPos : this.multiBlockType.SHAPES) {
+        MultiBlockType type = this.getMultiBlockType();
+        for (LocalBlockPos localCurPos : type.SHAPES) {
             BlockPos worldCurPos = this.getWorldPosFromMaster(masterWorldPos, localCurPos);
             if (worldCurPos.equals(masterWorldPos)) {
                 // At Master Position -> Skip

@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class MultiBlockType {
@@ -14,7 +15,7 @@ public class MultiBlockType {
     public final LocalBlockPos MASTER_OFFSET;
 
     private MultiBlockType() {
-        this.NAME = "default";
+        this.NAME = MultiBlockType.DEFAULT_ID;
         this.SHAPES = new StructShapes();
         this.MASTER_OFFSET = new LocalBlockPos(0, 0, 0);
     }
@@ -34,9 +35,9 @@ public class MultiBlockType {
         return masterWorldPos.subtract(roatatedMasterOffset).offset(rotatedLocalCurPos);
     }
 
-    public static final Map<String, MultiBlockType> TYPES =
-            Map.of("multiblock_master",  MultiBlockType.createDefault());
+    public static final Map<String, MultiBlockType> TYPES = new HashMap<>();
 
+    public static final String DEFAULT_ID = "default";
     public static MultiBlockType DEFAULT = MultiBlockType.createDefault();
 
     public static MultiBlockType create(String name, StructShapes shape, LocalBlockPos masterPos) {

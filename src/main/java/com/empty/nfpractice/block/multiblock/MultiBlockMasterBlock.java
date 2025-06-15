@@ -45,7 +45,7 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         MultiBlockMasterEntity be = new MultiBlockMasterEntity(pos, state);
-        be.setMultiBlockType(this.getType());
+        be.setTypeID(this.TYPE_ID);
         return be;
     }
 
