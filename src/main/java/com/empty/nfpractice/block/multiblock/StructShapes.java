@@ -1,5 +1,6 @@
 package com.empty.nfpractice.block.multiblock;
 
+import com.empty.nfpractice.NFPractice;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
@@ -11,7 +12,7 @@ import java.util.*;
 public class StructShapes implements Iterable<LocalBlockPos> {
     public final LocalBound blockWiseBound;
     private final VoxelShape fullShape;
-    private final Map<BlockPos, VoxelShape> blockShapes;
+    private final Map<LocalBlockPos, VoxelShape> blockShapes;
 
     public StructShapes() {
         this(Shapes.box(0,0,0,2,2, 2));
@@ -21,6 +22,7 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         this.fullShape = fullShape;
         this.blockWiseBound = LocalBound.of(fullShape);
         this.blockShapes = new HashMap<>();
+        this.splitVoxelShapePerBlock();
     }
 
     public VoxelShape shapeAt(LocalBlockPos blockPos) {
@@ -28,16 +30,14 @@ public class StructShapes implements Iterable<LocalBlockPos> {
             return Shapes.empty();
         }
         // PlaceHolder
-        this.fullShape.optimize();
-        return Shapes.block();
+        return this.blockShapes.get(blockPos);
     }
 
     public @NotNull boolean occupied(LocalBlockPos blockPos) {
         if (!blockWiseBound.isInside(blockPos)) {
             return false;
         }
-        // Rules
-        return true;
+        return blockShapes.containsKey(blockPos);
     }
 
     public @NotNull boolean occupied(int x, int y, int z) {
@@ -46,57 +46,21 @@ public class StructShapes implements Iterable<LocalBlockPos> {
 
     @Override
     public @NotNull Iterator<LocalBlockPos> iterator() {
-        return new ShapeBlockIterator();
-    }
-
-    public class ShapeBlockIterator implements Iterator<LocalBlockPos> {
-        int nextX, nextY, nextZ;
-
-        public ShapeBlockIterator() {
-            // To Minimal Pos
-            this.nextX = blockWiseBound.minX();
-            this.nextY = blockWiseBound.minY();
-            this.nextZ = blockWiseBound.minZ() - 1;
-            toNextOccupied();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return nextX < blockWiseBound.maxX();
-        }
-
-        @Override
-        public LocalBlockPos next() {
-            LocalBlockPos toRet = new LocalBlockPos(nextX, nextY, nextZ);
-            this.toNextOccupied();
-            return toRet;
-        }
-
-        public void toNextOccupied() {
-            do {
-                nextZ++;
-                if (nextZ >= blockWiseBound.maxZ()) {
-                    nextZ = 0;
-                    nextY++;
-                }
-                if (nextY >= blockWiseBound.maxY()) {
-                    nextY = 0;
-                    nextX++;
-                }
-            } while (nextX < blockWiseBound.maxX() && !occupied(nextX, nextY, nextZ));
-        }
+        return blockShapes.keySet().iterator();
     }
 
     public void splitVoxelShapePerBlock() {
-        Map<BlockPos, List<AABB>> splitMap = new HashMap<>();
+        this.blockShapes.clear();
+
+        Map<LocalBlockPos, List<AABB>> splitMap = new HashMap<>();
         for (AABB box : this.fullShape.toAabbs()) {
             // Determine all blocks this box overlaps
             int minX = (int)Math.floor(box.minX);
             int minY = (int)Math.floor(box.minY);
             int minZ = (int)Math.floor(box.minZ);
-            int maxX = (int)Math.floor(box.maxX);
-            int maxY = (int)Math.floor(box.maxY);
-            int maxZ = (int)Math.floor(box.maxZ);
+            int maxX = (int)Math.ceil(box.maxX) - 1;
+            int maxY = (int)Math.ceil(box.maxY) - 1;
+            int maxZ = (int)Math.ceil(box.maxZ) - 1;
 
             for (int x = minX; x <= maxX; x++) {
                 for (int y = minY; y <= maxY; y++) {
@@ -115,7 +79,7 @@ public class StructShapes implements Iterable<LocalBlockPos> {
                                     clipMaxX - x, clipMaxY - y, clipMaxZ - z
                             );
 
-                            BlockPos pos = new BlockPos(x, y, z);
+                            LocalBlockPos pos = new LocalBlockPos(x, y, z);
                             splitMap.computeIfAbsent(pos, k -> new ArrayList<>()).add(clipped);
                         }
                     }
@@ -124,11 +88,12 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         }
 
         // Convert clipped boxes to voxel shapes
-        for (Map.Entry<BlockPos, List<AABB>> entry : splitMap.entrySet()) {
+        for (Map.Entry<LocalBlockPos, List<AABB>> entry : splitMap.entrySet()) {
             VoxelShape combined = Shapes.empty();
             for (AABB box : entry.getValue()) {
                 combined = Shapes.or(combined, Shapes.create(box));
             }
+            //NFPractice.LOGGER.info("\nbox\n:{} = {}", entry.getKey(), combined);
             this.blockShapes.put(entry.getKey(), combined);
         }
     }
