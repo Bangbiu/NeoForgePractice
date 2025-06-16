@@ -25,6 +25,10 @@ public class LocalBlockPos extends BlockPos implements LocalFrameData<LocalBlock
         }
     }
 
+    public LocalBlockPos negate() {
+        return LocalBlockPos.of(this.multiply(-1));
+    }
+
     public static LocalBlockPos of(BlockPos pos) {
         return new LocalBlockPos(pos.getX(), pos.getY(), pos.getZ());
     }

@@ -1,5 +1,6 @@
 package com.empty.nfpractice.util;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
 
@@ -14,6 +15,10 @@ public class LocalAABB extends AABB implements LocalFrameData<LocalAABB> {
     public static LocalAABB of(AABB aabb) {
         return new LocalAABB(aabb.minX, aabb.minY, aabb.minZ,
                 aabb.maxX, aabb.maxY, aabb.maxZ);
+    }
+
+    public LocalAABB move(LocalBlockPos pos) {
+        return LocalAABB.of(super.move(pos));
     }
 
     @Override

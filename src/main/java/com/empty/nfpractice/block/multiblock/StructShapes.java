@@ -65,7 +65,7 @@ public class StructShapes implements Iterable<LocalBlockPos> {
      * Rotate to Fill Shape for other Direction
      */
     public void splitVoxelShapePerBlock() {
-        Map<LocalBlockPos, List<AABB>> splitMap = new HashMap<>();
+        Map<LocalBlockPos, List<LocalAABB>> splitMap = new HashMap<>();
         for (AABB box : this.fullShape.toAabbs()) {
             // Determine the range of blocks this AABB spans
             LocalBound bound = LocalBound.of(box);
@@ -79,14 +79,14 @@ public class StructShapes implements Iterable<LocalBlockPos> {
                 double clippedMaxZ = Math.min(1, box.maxZ - localPos.getZ());
 
                 if (clippedMinX < clippedMaxX && clippedMinY < clippedMaxY && clippedMinZ < clippedMaxZ) {
-                    AABB localBox = new AABB(clippedMinX, clippedMinY, clippedMinZ,
+                    LocalAABB localBox = new LocalAABB(clippedMinX, clippedMinY, clippedMinZ,
                             clippedMaxX, clippedMaxY, clippedMaxZ);
                     splitMap.computeIfAbsent(localPos, k -> new ArrayList<>()).add(localBox);
                 }
             }
         }
         // Convert clipped boxes to voxel shapes
-        for (Map.Entry<LocalBlockPos, List<AABB>> entry : splitMap.entrySet()) {
+        for (Map.Entry<LocalBlockPos, List<LocalAABB>> entry : splitMap.entrySet()) {
             VoxelShape combined = Shapes.empty();
             for (AABB box : entry.getValue()) {
                 combined = Shapes.or(combined, Shapes.create(box));
@@ -94,7 +94,6 @@ public class StructShapes implements Iterable<LocalBlockPos> {
 
             this.blockShapes.register(entry.getKey(), combined);
         }
-        NFPractice.LOGGER.info("\nboxes: {}", this.blockShapes.get());
     }
 
     public static StructShapes of(VoxelShape fullShape) {
@@ -119,13 +118,14 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         public void register(LocalBlockPos localPos, VoxelShape localShape) {
             this.get().put(localPos, localShape.optimize());
             // Register Rotated Shape
-            // Move shape from Block Frame to Structure Local Frame
-            VoxelShape inStructShape = localShape.move(localPos.getX(), localPos.getY(), localPos.getZ());
-            // Step 2: Rotate each AABB in the shape around Y-axis (origin = 0,0,0)
             VoxelShape rotatedShape = Shapes.empty();
             for (Direction dir : new Direction[] {Direction.SOUTH, Direction.WEST, Direction.EAST}) {
-                for (AABB box : inStructShape.toAabbs()) {
-                    AABB rotatedBox = LocalAABB.of(box).faceTo(dir);
+                for (AABB box : localShape.toAabbs()) {
+                    LocalAABB rotatedBox = LocalAABB.of(box).faceTo(dir);
+                    if (dir == Direction.SOUTH) {
+                        NFPractice.LOGGER.info("\nboxesFrom: {}\nboxesTo{}", box, rotatedBox);
+                    }
+
                     rotatedShape = Shapes.or(rotatedShape, Shapes.create(rotatedBox));
                 }
                 this.get(dir).put(localPos, rotatedShape.optimize());
