@@ -58,9 +58,9 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
         BlockPos masterWorldPos = ctx.getClickedPos();
         Level level = ctx.getLevel();
 
-        // This block is Master Block at MASTER OFFSET
+        // This block is Master Block at (0,0,0)
         for (LocalBlockPos localCurPos : type.shapes) {
-            BlockPos worldCurPos = type.getWorldPosFromMaster(masterWorldPos, localCurPos, dir);
+            BlockPos worldCurPos = masterWorldPos.offset(localCurPos.faceTo(dir));
             // Check if all block pos is avaliable
             if (!level.getBlockState(worldCurPos).canBeReplaced()) {
                 return null;

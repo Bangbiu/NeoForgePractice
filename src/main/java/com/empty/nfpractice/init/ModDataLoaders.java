@@ -41,7 +41,6 @@ public class ModDataLoaders {
                 String name = id.getPath();
                 if (mbInfo.has("name"))
                     name = mbInfo.get("name").getAsString();
-                LocalBlockPos masterPos = parsePos(mbInfo.getAsJsonArray("master"));
                 VoxelShape fullShape = Shapes.empty();
                 // Parse Voxel Shape
                 JsonArray array = entry.getValue().getAsJsonObject().getAsJsonArray("shape");
@@ -57,21 +56,13 @@ public class ModDataLoaders {
                     fullShape = Shapes.or(fullShape, boxShape);
                 }
 
-                MultiBlockType type = MultiBlockType.register(name, fullShape, masterPos);
+                MultiBlockType type = MultiBlockType.register(name, fullShape);
                 NFPractice.LOGGER.info("\n {}", type);
             }
         }
 
         private static Vec3 parseVec3(JsonArray arr) {
             return new Vec3(
-                    arr.get(0).getAsInt(),
-                    arr.get(1).getAsInt(),
-                    arr.get(2).getAsInt()
-            );
-        }
-
-        private static LocalBlockPos parsePos(JsonArray arr) {
-            return new LocalBlockPos(
                     arr.get(0).getAsInt(),
                     arr.get(1).getAsInt(),
                     arr.get(2).getAsInt()

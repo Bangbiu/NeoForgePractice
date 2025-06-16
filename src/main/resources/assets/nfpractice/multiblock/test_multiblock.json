@@ -1,6 +1,5 @@
 {
   "name": "test_multiblock",
-  "master": [1, 0, 0],
   "shape": [
       {
         "from": [4, 0, 2],

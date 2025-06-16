@@ -78,9 +78,9 @@ public class MultiBlockMasterEntity extends BlockEntity {
         BlockPos masterWorldPos = getBlockPos();
         MultiBlockType type = this.getMultiBlockType();
         for (LocalBlockPos localCurPos : type.shapes) {
-            if (localCurPos.equals(type.masterOffset))
+            if (localCurPos.equals(BlockPos.ZERO))
                 continue;
-            BlockPos worldCurPos = type.getWorldPosFromMaster(masterWorldPos, localCurPos, dir);
+            BlockPos worldCurPos = masterWorldPos.offset(localCurPos.faceTo(dir));
             if(!comsumer.apply(localCurPos, worldCurPos))
                 return false;
         }
