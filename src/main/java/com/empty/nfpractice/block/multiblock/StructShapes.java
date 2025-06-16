@@ -4,6 +4,7 @@ import com.empty.nfpractice.NFPractice;
 import com.empty.nfpractice.util.LocalAABB;
 import com.empty.nfpractice.util.LocalBlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -68,16 +69,10 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         Map<LocalBlockPos, List<AABB>> splitMap = new HashMap<>();
         for (AABB box : this.fullShape.toAabbs()) {
             // Determine the range of blocks this AABB spans
-            int minX = (int)Math.floor(box.minX);
-            int maxX = (int)Math.floor(box.maxX - 1e-6); // avoid ceiling rounding
-            int minY = (int)Math.floor(box.minY);
-            int maxY = (int)Math.floor(box.maxY - 1e-6);
-            int minZ = (int)Math.floor(box.minZ);
-            int maxZ = (int)Math.floor(box.maxZ - 1e-6);
-
-            for (int x = minX; x <= maxX; x++) {
-                for (int y = minY; y <= maxY; y++) {
-                    for (int z = minZ; z <= maxZ; z++) {
+            LocalBound bound = LocalBound.of(box);
+            for (int x = bound.minX(); x <= bound.maxX() ; x++) {
+                for (int y = bound.minY(); y <= bound.maxY() ; y++) {
+                    for (int z = bound.minZ(); z <= bound.maxZ() ; z++) {
                         LocalBlockPos blockPos = new LocalBlockPos(x, y, z);
 
                         // Clip the AABB to the block-local space [0,1)
@@ -154,15 +149,29 @@ public class StructShapes implements Iterable<LocalBlockPos> {
             super(0, 0, 0, maxX, maxY, maxZ);
         }
 
+        /*
+         * Calculate Half Open Range
+         * Find block index of value in between
+         * Returns [min, max)
+         * 3.0 -> Inside Block Index 2
+         */
+        public static int blockIndex(double value) {
+            // Value on edge need to deduct by 1
+            return Mth.floor(value) == Mth.ceil(value) ? Mth.floor(value) - 1 : Mth.floor(value);
+        }
+
         public static LocalBound of(VoxelShape shape) {
-            AABB shapeBound = shape.bounds();
+            return LocalBound.of(shape.bounds());
+        }
+
+        public static LocalBound of(AABB aabb) {
             return new LocalBound(
-                    (int) shapeBound.minX,
-                    (int) shapeBound.minY,
-                    (int) shapeBound.minZ,
-                    (int) shapeBound.maxX,
-                    (int) shapeBound.maxY,
-                    (int) shapeBound.maxZ
+                    blockIndex(aabb.minX),
+                    blockIndex(aabb.minY),
+                    blockIndex(aabb.minZ),
+                    blockIndex(aabb.maxX),
+                    blockIndex(aabb.maxY),
+                    blockIndex(aabb.maxZ)
             );
         }
     }
