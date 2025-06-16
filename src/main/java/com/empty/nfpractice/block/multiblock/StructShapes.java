@@ -3,6 +3,8 @@ package com.empty.nfpractice.block.multiblock;
 import com.empty.nfpractice.NFPractice;
 import com.empty.nfpractice.util.LocalAABB;
 import com.empty.nfpractice.util.LocalBlockPos;
+import com.google.common.collect.AbstractIterator;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -10,6 +12,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -60,9 +63,9 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         return blockShapes.get().keySet().iterator();
     }
 
-    /*
-     * Split the Full Voxel Shape to Blockwise Subshape
-     * Only Calculate the Default Shape (Facing North)
+    /**
+     * Split the Full Voxel Shape to Blockwise Subshape</br>
+     * Only Calculate the Default Shape (Facing North)</br>
      * Rotate to Fill Shape for other Direction
      */
     public void splitVoxelShapePerBlock() {
@@ -70,25 +73,19 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         for (AABB box : this.fullShape.toAabbs()) {
             // Determine the range of blocks this AABB spans
             LocalBound bound = LocalBound.of(box);
-            for (int x = bound.minX(); x <= bound.maxX() ; x++) {
-                for (int y = bound.minY(); y <= bound.maxY() ; y++) {
-                    for (int z = bound.minZ(); z <= bound.maxZ() ; z++) {
-                        LocalBlockPos blockPos = new LocalBlockPos(x, y, z);
+            for (LocalBlockPos localPos : bound) {
+                // Clip the AABB to the block-local space [0,1)
+                double clippedMinX = Math.max(0, box.minX - localPos.getX());
+                double clippedMaxX = Math.min(1, box.maxX - localPos.getX());
+                double clippedMinY = Math.max(0, box.minY - localPos.getY());
+                double clippedMaxY = Math.min(1, box.maxY - localPos.getY());
+                double clippedMinZ = Math.max(0, box.minZ - localPos.getZ());
+                double clippedMaxZ = Math.min(1, box.maxZ - localPos.getZ());
 
-                        // Clip the AABB to the block-local space [0,1)
-                        double clippedMinX = Math.max(0, box.minX - x);
-                        double clippedMaxX = Math.min(1, box.maxX - x);
-                        double clippedMinY = Math.max(0, box.minY - y);
-                        double clippedMaxY = Math.min(1, box.maxY - y);
-                        double clippedMinZ = Math.max(0, box.minZ - z);
-                        double clippedMaxZ = Math.min(1, box.maxZ - z);
-
-                        if (clippedMinX < clippedMaxX && clippedMinY < clippedMaxY && clippedMinZ < clippedMaxZ) {
-                            AABB localBox = new AABB(clippedMinX, clippedMinY, clippedMinZ,
-                                    clippedMaxX, clippedMaxY, clippedMaxZ);
-                            splitMap.computeIfAbsent(blockPos, k -> new ArrayList<>()).add(localBox);
-                        }
-                    }
+                if (clippedMinX < clippedMaxX && clippedMinY < clippedMaxY && clippedMinZ < clippedMaxZ) {
+                    AABB localBox = new AABB(clippedMinX, clippedMinY, clippedMinZ,
+                            clippedMaxX, clippedMaxY, clippedMaxZ);
+                    splitMap.computeIfAbsent(localPos, k -> new ArrayList<>()).add(localBox);
                 }
             }
         }
@@ -140,7 +137,7 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         }
     }
 
-    private static class LocalBound extends BoundingBox {
+    private static class LocalBound extends BoundingBox implements Iterable<LocalBlockPos> {
         public LocalBound(int x1, int y1, int z1, int x2, int y2, int z2) {
             super(x1, y1, z1, x2, y2, z2);
         }
@@ -149,11 +146,28 @@ public class StructShapes implements Iterable<LocalBlockPos> {
             super(0, 0, 0, maxX, maxY, maxZ);
         }
 
-        /*
-         * Calculate Half Open Range
+
+        @Override
+        public @NotNull Iterator<LocalBlockPos> iterator() {
+            Iterator<BlockPos> blockPosIterator = BlockPos.betweenClosed(
+                    this.minX(), this.minY(), this.minZ(),
+                    this.maxX(), this.maxY(), this.maxZ()
+            ).iterator();
+            return new AbstractIterator<>() {
+                @Override
+                protected @Nullable LocalBlockPos computeNext() {
+                    if (!blockPosIterator.hasNext())
+                        return this.endOfData();
+                    return LocalBlockPos.of(blockPosIterator.next());
+                }
+            };
+        }
+
+        /**
+         * Round Value to Half Open Range [min, max)</br>
          * Find block index of value in between
-         * Returns [min, max)
-         * 3.0 -> Inside Block Index 2
+         * <p>
+         * Example: 3.0 -> Inside Block Index 2
          */
         public static int blockIndex(double value) {
             // Value on edge need to deduct by 1
