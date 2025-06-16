@@ -24,7 +24,7 @@ public class MultiBlockType {
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + ": " + this.name +
-                "\n Of Shape Bounded by " + this.shapes.getBlockWiseBound();
+                "\n Of Shape Bounded by " + this.shapes.getBound();
     }
 
     public VoxelShape getFullShape() {

@@ -1,24 +1,43 @@
 package com.empty.nfpractice.util;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.LazyLoadedValue;
 import net.minecraft.world.phys.AABB;
 
-import java.util.Arrays;
+import java.util.*;
 
 public class LocalAABB extends AABB implements LocalFrameData<LocalAABB> {
-
+    private final LazyLoadedValue<LocalBound> bound;
     public LocalAABB(double x1, double y1, double z1, double x2, double y2, double z2) {
         super(x1, y1, z1, x2, y2, z2);
-    }
-
-    public static LocalAABB of(AABB aabb) {
-        return new LocalAABB(aabb.minX, aabb.minY, aabb.minZ,
-                aabb.maxX, aabb.maxY, aabb.maxZ);
+        this.bound = new LazyLoadedValue<>(() -> LocalBound.of(this));
     }
 
     public LocalAABB move(LocalBlockPos pos) {
         return LocalAABB.of(super.move(pos));
+    }
+
+    public LocalBound getBound() {
+        return this.bound.get();
+    }
+
+    public Map<LocalBlockPos, LocalAABB> splitPerBlock() {
+        Map<LocalBlockPos, LocalAABB> splitMap = new HashMap<>();
+        for (LocalBlockPos localPos : this.bound.get()) {
+            // Clip the AABB to the block-local space [0,1)
+            double clippedMinX = Math.max(0, this.minX - localPos.getX());
+            double clippedMaxX = Math.min(1, this.maxX - localPos.getX());
+            double clippedMinY = Math.max(0, this.minY - localPos.getY());
+            double clippedMaxY = Math.min(1, this.maxY - localPos.getY());
+            double clippedMinZ = Math.max(0, this.minZ - localPos.getZ());
+            double clippedMaxZ = Math.min(1, this.maxZ - localPos.getZ());
+            if (clippedMinX < clippedMaxX && clippedMinY < clippedMaxY && clippedMinZ < clippedMaxZ) {
+                LocalAABB localBox = new LocalAABB(clippedMinX, clippedMinY, clippedMinZ,
+                        clippedMaxX, clippedMaxY, clippedMaxZ);
+                splitMap.put(localPos, localBox);
+            }
+        }
+        return splitMap;
     }
 
     @Override
@@ -46,5 +65,10 @@ public class LocalAABB extends AABB implements LocalFrameData<LocalAABB> {
         double maxZ = Arrays.stream(corners).mapToDouble(v -> v.z).max().getAsDouble();
 
         return new LocalAABB(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    public static LocalAABB of(AABB aabb) {
+        return new LocalAABB(aabb.minX, aabb.minY, aabb.minZ,
+                aabb.maxX, aabb.maxY, aabb.maxZ);
     }
 }

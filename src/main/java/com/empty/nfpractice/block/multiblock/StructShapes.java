@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class StructShapes implements Iterable<LocalBlockPos> {
-    private final LocalBound blockWiseBound;
+    private final LocalBound bound;
     private final VoxelShape fullShape;
     private final BlockWiseShapes blockShapes;
 
@@ -23,7 +23,7 @@ public class StructShapes implements Iterable<LocalBlockPos> {
     public StructShapes(VoxelShape fullShape) {
         this.fullShape = fullShape;
         this.blockShapes = new BlockWiseShapes();
-        this.blockWiseBound = LocalBound.of(fullShape);
+        this.bound = LocalBound.of(fullShape);
         // Fill Block Shapes
         this.splitVoxelShapePerBlock();
     }
@@ -43,12 +43,12 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         return this.fullShape;
     }
 
-    public LocalBound getBlockWiseBound() {
-        return this.blockWiseBound;
+    public LocalBound getBound() {
+        return this.bound;
     }
 
     public @NotNull boolean occupied(LocalBlockPos blockPos) {
-        if (!blockWiseBound.isInside(blockPos)) {
+        if (!bound.isInside(blockPos)) {
             return false;
         }
         return blockShapes.get().containsKey(blockPos);
@@ -57,6 +57,10 @@ public class StructShapes implements Iterable<LocalBlockPos> {
     @Override
     public @NotNull Iterator<LocalBlockPos> iterator() {
         return blockShapes.get().keySet().iterator();
+    }
+
+    public @NotNull Iterator<LocalBlockPos> allLocalPosFacing(Direction dir) {
+        return blockShapes.get(dir).keySet().iterator();
     }
 
     /**
@@ -68,21 +72,9 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         Map<LocalBlockPos, List<LocalAABB>> splitMap = new HashMap<>();
         for (AABB box : this.fullShape.toAabbs()) {
             // Determine the range of blocks this AABB spans
-            LocalBound bound = LocalBound.of(box);
-            for (LocalBlockPos localPos : bound) {
-                // Clip the AABB to the block-local space [0,1)
-                double clippedMinX = Math.max(0, box.minX - localPos.getX());
-                double clippedMaxX = Math.min(1, box.maxX - localPos.getX());
-                double clippedMinY = Math.max(0, box.minY - localPos.getY());
-                double clippedMaxY = Math.min(1, box.maxY - localPos.getY());
-                double clippedMinZ = Math.max(0, box.minZ - localPos.getZ());
-                double clippedMaxZ = Math.min(1, box.maxZ - localPos.getZ());
-
-                if (clippedMinX < clippedMaxX && clippedMinY < clippedMaxY && clippedMinZ < clippedMaxZ) {
-                    LocalAABB localBox = new LocalAABB(clippedMinX, clippedMinY, clippedMinZ,
-                            clippedMaxX, clippedMaxY, clippedMaxZ);
-                    splitMap.computeIfAbsent(localPos, k -> new ArrayList<>()).add(localBox);
-                }
+            LocalAABB localBox = LocalAABB.of(box);
+            for (Map.Entry<LocalBlockPos, LocalAABB> entry : localBox.splitPerBlock().entrySet()) {
+                splitMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
             }
         }
         // Convert clipped boxes to voxel shapes
