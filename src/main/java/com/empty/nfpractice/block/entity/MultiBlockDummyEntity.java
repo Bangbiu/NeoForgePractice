@@ -58,8 +58,8 @@ public class MultiBlockDummyEntity extends BlockEntity {
 
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (masterPos != null) {
-            if (level.getBlockEntity(masterPos) instanceof MultiBlockMasterEntity entity) {
-                return entity.getBlockShape(localPos);
+            if (level.getBlockEntity(this.masterPos) instanceof MultiBlockMasterEntity entity) {
+                return entity.getBlockShape(this.localPos);
             }
         }
 

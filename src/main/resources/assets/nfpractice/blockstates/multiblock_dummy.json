@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "nfpractice:block/pedestal"
+      "model": "minecraft:block/stone"
     }
   }
 }

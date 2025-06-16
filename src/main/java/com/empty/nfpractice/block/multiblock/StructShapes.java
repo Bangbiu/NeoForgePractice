@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 public class StructShapes implements Iterable<LocalBlockPos> {
-    public final LocalBound blockWiseBound;
+    private final LocalBound blockWiseBound;
     private final VoxelShape fullShape;
     private final Map<LocalBlockPos, VoxelShape> blockShapes;
 
@@ -29,8 +29,15 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         if (!this.occupied(blockPos)) {
             return Shapes.empty();
         }
-        // PlaceHolder
         return this.blockShapes.get(blockPos);
+    }
+
+    public VoxelShape getFullShape() {
+        return this.fullShape;
+    }
+
+    public LocalBound getBlockWiseBound() {
+        return this.blockWiseBound;
     }
 
     public @NotNull boolean occupied(LocalBlockPos blockPos) {
@@ -54,39 +61,36 @@ public class StructShapes implements Iterable<LocalBlockPos> {
 
         Map<LocalBlockPos, List<AABB>> splitMap = new HashMap<>();
         for (AABB box : this.fullShape.toAabbs()) {
-            // Determine all blocks this box overlaps
+            // Determine the range of blocks this AABB spans
             int minX = (int)Math.floor(box.minX);
+            int maxX = (int)Math.floor(box.maxX - 1e-6); // avoid ceiling rounding
             int minY = (int)Math.floor(box.minY);
+            int maxY = (int)Math.floor(box.maxY - 1e-6);
             int minZ = (int)Math.floor(box.minZ);
-            int maxX = (int)Math.ceil(box.maxX) - 1;
-            int maxY = (int)Math.ceil(box.maxY) - 1;
-            int maxZ = (int)Math.ceil(box.maxZ) - 1;
+            int maxZ = (int)Math.floor(box.maxZ - 1e-6);
 
             for (int x = minX; x <= maxX; x++) {
                 for (int y = minY; y <= maxY; y++) {
                     for (int z = minZ; z <= maxZ; z++) {
-                        double clipMinX = Math.max(box.minX, x);
-                        double clipMinY = Math.max(box.minY, y);
-                        double clipMinZ = Math.max(box.minZ, z);
-                        double clipMaxX = Math.min(box.maxX, x + 1);
-                        double clipMaxY = Math.min(box.maxY, y + 1);
-                        double clipMaxZ = Math.min(box.maxZ, z + 1);
+                        LocalBlockPos blockPos = new LocalBlockPos(x, y, z);
 
-                        // Skip if the box doesn't overlap this block
-                        if (clipMinX < clipMaxX && clipMinY < clipMaxY && clipMinZ < clipMaxZ) {
-                            AABB clipped = new AABB(
-                                    clipMinX - x, clipMinY - y, clipMinZ - z,
-                                    clipMaxX - x, clipMaxY - y, clipMaxZ - z
-                            );
+                        // Clip the AABB to the block-local space [0,1)
+                        double clippedMinX = Math.max(0, box.minX - x);
+                        double clippedMaxX = Math.min(1, box.maxX - x);
+                        double clippedMinY = Math.max(0, box.minY - y);
+                        double clippedMaxY = Math.min(1, box.maxY - y);
+                        double clippedMinZ = Math.max(0, box.minZ - z);
+                        double clippedMaxZ = Math.min(1, box.maxZ - z);
 
-                            LocalBlockPos pos = new LocalBlockPos(x, y, z);
-                            splitMap.computeIfAbsent(pos, k -> new ArrayList<>()).add(clipped);
+                        if (clippedMinX < clippedMaxX && clippedMinY < clippedMaxY && clippedMinZ < clippedMaxZ) {
+                            AABB localBox = new AABB(clippedMinX, clippedMinY, clippedMinZ,
+                                    clippedMaxX, clippedMaxY, clippedMaxZ);
+                            splitMap.computeIfAbsent(blockPos, k -> new ArrayList<>()).add(localBox);
                         }
                     }
                 }
             }
         }
-
         // Convert clipped boxes to voxel shapes
         for (Map.Entry<LocalBlockPos, List<AABB>> entry : splitMap.entrySet()) {
             VoxelShape combined = Shapes.empty();
@@ -96,6 +100,10 @@ public class StructShapes implements Iterable<LocalBlockPos> {
             //NFPractice.LOGGER.info("\nbox\n:{} = {}", entry.getKey(), combined);
             this.blockShapes.put(entry.getKey(), combined);
         }
+    }
+
+    public static StructShapes of(VoxelShape fullShape) {
+        return new StructShapes(fullShape);
     }
 
     public static class LocalBound extends BoundingBox {
@@ -113,9 +121,9 @@ public class StructShapes implements Iterable<LocalBlockPos> {
                     (int) shapeBound.minX,
                     (int) shapeBound.minY,
                     (int) shapeBound.minZ,
-                    (int) shapeBound.maxX + 1,
-                    (int) shapeBound.maxY + 1,
-                    (int) shapeBound.maxZ + 1
+                    (int) shapeBound.maxX,
+                    (int) shapeBound.maxY,
+                    (int) shapeBound.maxZ
             );
         }
     }

@@ -20,7 +20,7 @@ public class LocalBlockPos extends BlockPos {
             case WEST:
                 return new LocalBlockPos(_z, _y, -_x); // 270 degrees CW
             default:
-                return new LocalBlockPos(_z, _y, _x); // no rotation
+                return new LocalBlockPos(_x, _y, _z); // no rotation
         }
     }
 

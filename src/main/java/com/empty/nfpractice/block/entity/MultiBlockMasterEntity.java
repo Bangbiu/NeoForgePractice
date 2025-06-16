@@ -1,10 +1,12 @@
 package com.empty.nfpractice.block.entity;
 
+import com.empty.nfpractice.NFPractice;
 import com.empty.nfpractice.block.multiblock.LocalBlockPos;
 import com.empty.nfpractice.block.multiblock.MultiBlockMasterBlock;
 import com.empty.nfpractice.block.multiblock.MultiBlockType;
 import com.empty.nfpractice.init.ModBlockEntities;
 import com.empty.nfpractice.init.ModMultiBlock;
+import com.ibm.icu.impl.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -12,11 +14,19 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class MultiBlockMasterEntity extends BlockEntity {
     private String TYPE_ID;
@@ -58,59 +68,61 @@ public class MultiBlockMasterEntity extends BlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("type_id")) {
-            this.TYPE_ID = tag.getString("type_id");
+            this.setTypeID(tag.getString("type_id"));
         }
     }
 
-    public BlockPos getWorldPosFromMaster(BlockPos masterWorldPos, LocalBlockPos localPos) {
-        Direction dir = this.getBlockState().getValue(MultiBlockMasterBlock.FACING);
-        return this.getMultiBlockType().getWorldPosFromMaster(masterWorldPos, localPos, dir);
-    }
-
-    @NotNull
-    public VoxelShape getBlockShape(LocalBlockPos localPos) {
-        return this.getMultiBlockType().SHAPES.shapeAt(localPos);
+    public @NotNull VoxelShape getBlockShape(LocalBlockPos localPos) {
+        return this.getMultiBlockType().getShapeAt(localPos);
     }
 
     public MultiBlockType getMultiBlockType() {
-        return MultiBlockType.TYPES.getOrDefault(this.TYPE_ID, MultiBlockType.DEFAULT);
+        return MultiBlockType.request(this.TYPE_ID);
+    }
+
+    public boolean forEachPartPos(BiFunction<LocalBlockPos, BlockPos, Boolean> comsumer) {
+        Direction dir = this.getBlockState().getValue(MultiBlockMasterBlock.FACING);
+        BlockPos masterWorldPos = getBlockPos();
+        MultiBlockType type = this.getMultiBlockType();
+        for (LocalBlockPos localCurPos : type.shapes) {
+            if (localCurPos.equals(type.masterOffset))
+                continue;
+            BlockPos worldCurPos = type.getWorldPosFromMaster(masterWorldPos, localCurPos, dir);
+            if(!comsumer.apply(localCurPos, worldCurPos))
+                return false;
+        }
+        return true;
     }
 
     public void createStructure() {
         BlockPos masterWorldPos = getBlockPos();
-        MultiBlockType type = this.getMultiBlockType();
-        for (LocalBlockPos localCurPos : type.SHAPES) {
-            BlockPos worldCurPos = this.getWorldPosFromMaster(masterWorldPos, localCurPos);
-            if (worldCurPos.equals(masterWorldPos)) {
-                // At Master Position -> Skip
-                continue;
-            }
-            // Place Dummy
-            level.setBlock(worldCurPos, ModMultiBlock.MULTIBLOCK_DUMMY.get().defaultBlockState(), 3);
-            BlockEntity be = level.getBlockEntity(worldCurPos);
-            if (be instanceof MultiBlockDummyEntity dummy) {
-                dummy.config(masterWorldPos, localCurPos);
-            }
-        }
+        this.forEachPartPos(
+                (localPos, worldPos) -> {
+                    // Place Part
+                    level.setBlock(worldPos, ModMultiBlock.MULTIBLOCK_DUMMY.get().defaultBlockState(), 3);
+                    BlockEntity be = level.getBlockEntity(worldPos);
+
+                    if (be instanceof MultiBlockDummyEntity dummy) {
+                        dummy.config(masterWorldPos, localPos);
+                    }
+                    NFPractice.LOGGER.info("\nbox\n:{} = {}", localPos, this.getMultiBlockType().getShapeAt(localPos));
+                    return true;
+                }
+        );
     }
 
     public void removeStructure() {
-        BlockPos masterWorldPos = this.getBlockPos();
-        MultiBlockType type = this.getMultiBlockType();
-        for (LocalBlockPos localCurPos : type.SHAPES) {
-            BlockPos worldCurPos = this.getWorldPosFromMaster(masterWorldPos, localCurPos);
-            if (worldCurPos.equals(masterWorldPos)) {
-                // At Master Position -> Skip
-                continue;
-            }
-
-            // Remove Dummy
-            if (level.getBlockState(worldCurPos).getBlock() == ModMultiBlock.MULTIBLOCK_DUMMY.get()) {
-                level.removeBlock(worldCurPos, false);
-            }
-        };
+        BlockPos masterWorldPos = getBlockPos();
+        this.forEachPartPos(
+                (localPos, worldPos) -> {
+                    // Remove Dummy
+                    if (level.getBlockState(worldPos).getBlock() == ModMultiBlock.MULTIBLOCK_DUMMY.get()) {
+                        level.removeBlock(worldPos, false);
+                    }
+                    return true;
+                }
+        );
         // Remove Master
         level.removeBlock(masterWorldPos, false);
     }
-
 }

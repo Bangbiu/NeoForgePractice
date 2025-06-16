@@ -58,7 +58,7 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
         Level level = ctx.getLevel();
 
         // This block is Master Block at MASTER OFFSET
-        for (LocalBlockPos localCurPos : type.SHAPES) {
+        for (LocalBlockPos localCurPos : type.shapes) {
             BlockPos worldCurPos = type.getWorldPosFromMaster(masterWorldPos, localCurPos, dir);
             // Check if all block pos is avaliable
             if (!level.getBlockState(worldCurPos).canBeReplaced()) {
@@ -99,7 +99,12 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
 
     @Override
     protected VoxelShape getVisualShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return super.getVisualShape(state, level, pos, context);
+        return this.getType().getFullShape();
+    }
+
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return this.getType().getMasterShape();
     }
 
     @Override
@@ -108,7 +113,7 @@ public class MultiBlockMasterBlock extends BaseEntityBlock {
     }
 
     public MultiBlockType getType() {
-        return MultiBlockType.TYPES.getOrDefault(this.TYPE_ID, MultiBlockType.DEFAULT);
+        return MultiBlockType.request(this.TYPE_ID);
     }
 
     public BlockState getMasterBlockState(Direction facing) {

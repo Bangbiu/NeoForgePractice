@@ -8,6 +8,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -27,35 +32,43 @@ public class ModDataLoaders {
 
         @Override
         protected void apply(Map<ResourceLocation, JsonElement> objectMap, ResourceManager resourceManager, ProfilerFiller profiler) {
-            MultiBlockType.TYPES.clear();
-            // Put Default
-            MultiBlockType.TYPES.put(MultiBlockType.DEFAULT_ID, MultiBlockType.DEFAULT);
-            // Parsing JSON
+            MultiBlockType.clear();
+            MultiBlockType.init();
+            // Loading JSON
             for (Map.Entry<ResourceLocation, JsonElement> entry : objectMap.entrySet()) {
                 ResourceLocation id = entry.getKey();
-                NFPractice.LOGGER.info("\n Loading {}\n", id.getPath());
                 JsonObject mbInfo = entry.getValue().getAsJsonObject();
                 // Fields
-                String name = mbInfo.get("name").getAsString();
+                String name = id.getPath();
+                if (mbInfo.has("name"))
+                    name = mbInfo.get("name").getAsString();
                 LocalBlockPos masterPos = parsePos(mbInfo.getAsJsonArray("master"));
+                VoxelShape fullShape = Shapes.empty();
+                // Parse Voxel Shape
+                JsonArray array = entry.getValue().getAsJsonObject().getAsJsonArray("shape");
+                for (JsonElement boxElement : array) {
+                    JsonObject box = boxElement.getAsJsonObject();
+                    Vec3 from = parseVec3(box.getAsJsonArray("from"));
+                    Vec3 to   = parseVec3(box.getAsJsonArray("to"));
 
+                    VoxelShape boxShape = Block.box(
+                            from.x, from.y, from.z,
+                            to.x, to.y, to.z
+                    );
+                    fullShape = Shapes.or(fullShape, boxShape);
+                }
 
-//                if (true) continue;
-//
-//
-//                JsonArray array = entry.getValue().getAsJsonObject().getAsJsonArray("shape");
-//
-//                VoxelShape shape = Shapes.empty();
-//                for (JsonElement boxElement : array) {
-//                    JsonObject box = boxElement.getAsJsonObject();
-//                    Vec3 from = parseVec3(box.getAsJsonArray("from"));
-//                    Vec3 to   = parseVec3(box.getAsJsonArray("to"));
-//
-//                    AABB aabb = new AABB(from.x / 16, from.y / 16, from.z / 16,
-//                            to.x / 16,   to.y / 16,   to.z / 16);
-//                    shape = Shapes.or(shape, Shapes.create(aabb));
-//                }
+                MultiBlockType type = MultiBlockType.register(name, fullShape, masterPos);
+                NFPractice.LOGGER.info("\n {}", type);
             }
+        }
+
+        private static Vec3 parseVec3(JsonArray arr) {
+            return new Vec3(
+                    arr.get(0).getAsInt(),
+                    arr.get(1).getAsInt(),
+                    arr.get(2).getAsInt()
+            );
         }
 
         private static LocalBlockPos parsePos(JsonArray arr) {
