@@ -1,6 +1,6 @@
 package com.empty.nfpractice.block.multiblock;
 
-import com.empty.nfpractice.block.entity.MultiBlockDummyEntity;
+import com.empty.nfpractice.block.entity.MultiBlockPartEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
@@ -14,37 +14,37 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class MultiBlockDummyBlock extends BaseEntityBlock {
+public class MultiBlockPartBlock extends BaseEntityBlock {
 
-    public MultiBlockDummyBlock() {
+    public MultiBlockPartBlock() {
         this(Properties.of().strength(0.5f).noOcclusion());
     }
 
-    public MultiBlockDummyBlock(Properties properties) {
+    public MultiBlockPartBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any());
     }
 
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
-        return simpleCodec(MultiBlockDummyBlock::new);
+        return simpleCodec(MultiBlockPartBlock::new);
     }
 
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new MultiBlockDummyEntity(pos, state);
+        return new MultiBlockPartEntity(pos, state);
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (level.getBlockEntity(pos) instanceof MultiBlockDummyEntity entity)
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        if (level.getBlockEntity(pos) instanceof MultiBlockPartEntity entity)
             return entity.getShape(state, level, pos, context);
         return Shapes.block();
     }
 
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (level.getBlockEntity(pos) instanceof MultiBlockDummyEntity entity) {
+        if (level.getBlockEntity(pos) instanceof MultiBlockPartEntity entity) {
             entity.removeStructure();
         }
         super.onRemove(state, level, pos, newState, movedByPiston);

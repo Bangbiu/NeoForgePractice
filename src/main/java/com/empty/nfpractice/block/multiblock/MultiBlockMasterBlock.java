@@ -22,7 +22,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class MultiBlockMasterBlock extends BaseEntityBlock {
+public class MultiBlockMasterBlock extends MultiBlockPartBlock {
     private final String TYPE_ID;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 

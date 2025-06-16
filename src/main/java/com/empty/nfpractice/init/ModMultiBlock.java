@@ -1,7 +1,7 @@
 package com.empty.nfpractice.init;
 
 import com.empty.nfpractice.NFPractice;
-import com.empty.nfpractice.block.multiblock.MultiBlockDummyBlock;
+import com.empty.nfpractice.block.multiblock.MultiBlockPartBlock;
 import com.empty.nfpractice.block.multiblock.MultiBlockMasterBlock;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -18,7 +18,7 @@ public class ModMultiBlock {
             DeferredRegister.createBlocks(NFPractice.MOD_ID);
 
     public static final DeferredBlock<Block> MULTIBLOCK_DUMMY = registerBlock("multiblock_dummy",
-            () -> new MultiBlockDummyBlock());
+            () -> new MultiBlockPartBlock());
 
     public static final DeferredBlock<Block> MULTIBLOCK_MASTER = registerMultiBlock("multiblock_master");
 

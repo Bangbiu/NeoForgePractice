@@ -1,6 +1,6 @@
 package com.empty.nfpractice.block.entity;
 
-import com.empty.nfpractice.NFPractice;
+import com.empty.nfpractice.block.multiblock.MultiBlockPartBlock;
 import com.empty.nfpractice.util.LocalBlockPos;
 import com.empty.nfpractice.block.multiblock.MultiBlockMasterBlock;
 import com.empty.nfpractice.block.multiblock.MultiBlockType;
@@ -25,8 +25,7 @@ public class MultiBlockMasterEntity extends BlockEntity {
     private String TYPE_ID;
 
     public MultiBlockMasterEntity(BlockPos pos, BlockState blockState) {
-        super(ModBlockEntities.MULTIBLOCK_MASTER_BE.get(), pos, blockState);
-        this.TYPE_ID = MultiBlockType.DEFAULT_ID;
+        super(ModBlockEntities.MULTIBLOCK_MASTER_BE.get(),pos, blockState);
     }
 
     public String getTypeID() {
@@ -36,7 +35,6 @@ public class MultiBlockMasterEntity extends BlockEntity {
     public void setTypeID(String TYPE_ID) {
         this.TYPE_ID = TYPE_ID;
     }
-
 
     @Nullable
     @Override
@@ -95,7 +93,7 @@ public class MultiBlockMasterEntity extends BlockEntity {
                     level.setBlock(worldPos, ModMultiBlock.MULTIBLOCK_DUMMY.get().defaultBlockState(), 3);
                     BlockEntity be = level.getBlockEntity(worldPos);
 
-                    if (be instanceof MultiBlockDummyEntity dummy) {
+                    if (be instanceof MultiBlockPartEntity dummy) {
                         dummy.config(masterWorldPos, localPos);
                     }
                     return true;

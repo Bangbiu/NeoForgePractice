@@ -1,5 +1,6 @@
 package com.empty.nfpractice.block.entity;
 
+import com.empty.nfpractice.block.multiblock.MultiBlockType;
 import com.empty.nfpractice.util.LocalBlockPos;
 import com.empty.nfpractice.init.ModBlockEntities;
 import net.minecraft.core.BlockPos;
@@ -10,29 +11,23 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class MultiBlockDummyEntity extends BlockEntity {
+public class MultiBlockPartEntity extends BlockEntity {
     private BlockPos masterPos;
     private LocalBlockPos localPos;
 
-    public MultiBlockDummyEntity(BlockPos pos, BlockState blockState) {
-        super(ModBlockEntities.MULTIBLOCK_DUMMY_BE.get(), pos, blockState);
+    public MultiBlockPartEntity(BlockPos pos, BlockState blockState) {
+        this(ModBlockEntities.MULTIBLOCK_DUMMY_BE.get(),pos, blockState);
     }
 
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
-        return saveWithoutMetadata(pRegistries);
+    public MultiBlockPartEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+        super(type, pos, blockState);
     }
 
     public BlockPos getMasterPos() {
