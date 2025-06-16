@@ -1,13 +1,14 @@
-package com.empty.nfpractice.block.multiblock;
+package com.empty.nfpractice.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
-public class LocalBlockPos extends BlockPos {
+public class LocalBlockPos extends BlockPos implements LocalFrameData<LocalBlockPos> {
     public LocalBlockPos(int x, int y, int z) {
         super(x, y, z);
     }
 
+    @Override
     public LocalBlockPos faceTo(Direction dir) {
         int _x = this.getX();
         int _y = this.getY();

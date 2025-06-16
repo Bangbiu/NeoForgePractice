@@ -1,7 +1,7 @@
 package com.empty.nfpractice.init;
 
 import com.empty.nfpractice.NFPractice;
-import com.empty.nfpractice.block.multiblock.LocalBlockPos;
+import com.empty.nfpractice.util.LocalBlockPos;
 import com.empty.nfpractice.block.multiblock.MultiBlockType;
 import com.google.gson.*;
 import net.minecraft.resources.ResourceLocation;
@@ -9,7 +9,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;

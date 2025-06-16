@@ -1,5 +1,6 @@
 package com.empty.nfpractice.block.multiblock;
 
+import com.empty.nfpractice.util.LocalBlockPos;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -29,7 +30,7 @@ public class MultiBlockType {
     public String toString() {
         return this.getClass().getSimpleName() + ": " + this.name +
                 "\n Centered At " +  this.masterOffset.toString() +
-                "\n Of Shape Bounded by " + this.shapes.getBlockWiseBound().toString();
+                "\n Of Shape Bounded by " + this.shapes.getBlockWiseBound();
     }
 
     public VoxelShape getFullShape() {

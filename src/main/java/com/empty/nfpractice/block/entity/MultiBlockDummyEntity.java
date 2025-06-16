@@ -1,6 +1,6 @@
 package com.empty.nfpractice.block.entity;
 
-import com.empty.nfpractice.block.multiblock.LocalBlockPos;
+import com.empty.nfpractice.util.LocalBlockPos;
 import com.empty.nfpractice.init.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;

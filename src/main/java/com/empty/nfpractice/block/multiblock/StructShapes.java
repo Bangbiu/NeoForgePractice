@@ -1,9 +1,12 @@
 package com.empty.nfpractice.block.multiblock;
 
 import com.empty.nfpractice.NFPractice;
-import net.minecraft.core.BlockPos;
+import com.empty.nfpractice.util.LocalAABB;
+import com.empty.nfpractice.util.LocalBlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +15,7 @@ import java.util.*;
 public class StructShapes implements Iterable<LocalBlockPos> {
     private final LocalBound blockWiseBound;
     private final VoxelShape fullShape;
-    private final Map<LocalBlockPos, VoxelShape> blockShapes;
+    private final BlockWiseShapes blockShapes;
 
     public StructShapes() {
         this(Shapes.box(0,0,0,2,2, 2));
@@ -20,16 +23,20 @@ public class StructShapes implements Iterable<LocalBlockPos> {
 
     public StructShapes(VoxelShape fullShape) {
         this.fullShape = fullShape;
+        this.blockShapes = new BlockWiseShapes();
         this.blockWiseBound = LocalBound.of(fullShape);
-        this.blockShapes = new HashMap<>();
         this.splitVoxelShapePerBlock();
     }
 
-    public VoxelShape shapeAt(LocalBlockPos blockPos) {
-        if (!this.occupied(blockPos)) {
+    public VoxelShape shapeAt(LocalBlockPos localPos) {
+        return this.rotatedShapeAt(localPos, Direction.NORTH);
+    }
+
+    public VoxelShape rotatedShapeAt(LocalBlockPos localPos, Direction dir) {
+        if (!this.occupied(localPos)) {
             return Shapes.empty();
         }
-        return this.blockShapes.get(blockPos);
+        return this.blockShapes.get(dir).get(localPos);
     }
 
     public VoxelShape getFullShape() {
@@ -44,21 +51,20 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         if (!blockWiseBound.isInside(blockPos)) {
             return false;
         }
-        return blockShapes.containsKey(blockPos);
-    }
-
-    public @NotNull boolean occupied(int x, int y, int z) {
-        return this.occupied(new LocalBlockPos(x, y, z));
+        return blockShapes.get().containsKey(blockPos);
     }
 
     @Override
     public @NotNull Iterator<LocalBlockPos> iterator() {
-        return blockShapes.keySet().iterator();
+        return blockShapes.get().keySet().iterator();
     }
 
+    /*
+     * Split the Full Voxel Shape to Blockwise Subshape
+     * Only Calculate the Default Shape (Facing North)
+     * Rotate to Fill Shape for other Direction
+     */
     public void splitVoxelShapePerBlock() {
-        this.blockShapes.clear();
-
         Map<LocalBlockPos, List<AABB>> splitMap = new HashMap<>();
         for (AABB box : this.fullShape.toAabbs()) {
             // Determine the range of blocks this AABB spans
@@ -97,16 +103,49 @@ public class StructShapes implements Iterable<LocalBlockPos> {
             for (AABB box : entry.getValue()) {
                 combined = Shapes.or(combined, Shapes.create(box));
             }
-            //NFPractice.LOGGER.info("\nbox\n:{} = {}", entry.getKey(), combined);
-            this.blockShapes.put(entry.getKey(), combined);
+
+            this.blockShapes.register(entry.getKey(), combined);
         }
+        NFPractice.LOGGER.info("\nboxes: {}", this.blockShapes.get());
     }
 
     public static StructShapes of(VoxelShape fullShape) {
         return new StructShapes(fullShape);
     }
 
-    public static class LocalBound extends BoundingBox {
+    private static class BlockWiseShapes extends EnumMap<Direction, Map<LocalBlockPos, VoxelShape>> {
+        public BlockWiseShapes() {
+            super(Direction.class);
+            this.put(Direction.NORTH, new HashMap<>());
+            this.put(Direction.SOUTH, new HashMap<>());
+            this.put(Direction.WEST, new HashMap<>());
+            this.put(Direction.EAST, new HashMap<>());
+            this.put(Direction.UP, this.get());
+            this.put(Direction.DOWN, this.get());
+        }
+
+        public Map<LocalBlockPos, VoxelShape> get() {
+            return this.get(Direction.NORTH);
+        }
+
+        public void register(LocalBlockPos localPos, VoxelShape localShape) {
+            this.get().put(localPos, localShape.optimize());
+            // Register Rotated Shape
+            // Move shape from Block Frame to Structure Local Frame
+            VoxelShape inStructShape = localShape.move(localPos.getX(), localPos.getY(), localPos.getZ());
+            // Step 2: Rotate each AABB in the shape around Y-axis (origin = 0,0,0)
+            VoxelShape rotatedShape = Shapes.empty();
+            for (Direction dir : new Direction[] {Direction.SOUTH, Direction.WEST, Direction.EAST}) {
+                for (AABB box : inStructShape.toAabbs()) {
+                    AABB rotatedBox = LocalAABB.of(box).faceTo(dir);
+                    rotatedShape = Shapes.or(rotatedShape, Shapes.create(rotatedBox));
+                }
+                this.get(dir).put(localPos, rotatedShape.optimize());
+            }
+        }
+    }
+
+    private static class LocalBound extends BoundingBox {
         public LocalBound(int x1, int y1, int z1, int x2, int y2, int z2) {
             super(x1, y1, z1, x2, y2, z2);
         }

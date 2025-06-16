@@ -1,12 +1,11 @@
 package com.empty.nfpractice.block.entity;
 
 import com.empty.nfpractice.NFPractice;
-import com.empty.nfpractice.block.multiblock.LocalBlockPos;
+import com.empty.nfpractice.util.LocalBlockPos;
 import com.empty.nfpractice.block.multiblock.MultiBlockMasterBlock;
 import com.empty.nfpractice.block.multiblock.MultiBlockType;
 import com.empty.nfpractice.init.ModBlockEntities;
 import com.empty.nfpractice.init.ModMultiBlock;
-import com.ibm.icu.impl.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -14,19 +13,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class MultiBlockMasterEntity extends BlockEntity {
     private String TYPE_ID;
@@ -105,7 +98,6 @@ public class MultiBlockMasterEntity extends BlockEntity {
                     if (be instanceof MultiBlockDummyEntity dummy) {
                         dummy.config(masterWorldPos, localPos);
                     }
-                    NFPractice.LOGGER.info("\nbox\n:{} = {}", localPos, this.getMultiBlockType().getShapeAt(localPos));
                     return true;
                 }
         );
