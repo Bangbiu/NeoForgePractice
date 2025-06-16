@@ -3,16 +3,11 @@ package com.empty.nfpractice.block.multiblock;
 import com.empty.nfpractice.NFPractice;
 import com.empty.nfpractice.util.LocalAABB;
 import com.empty.nfpractice.util.LocalBlockPos;
-import com.google.common.collect.AbstractIterator;
-import net.minecraft.core.BlockPos;
+import com.empty.nfpractice.util.LocalBound;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -29,6 +24,7 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         this.fullShape = fullShape;
         this.blockShapes = new BlockWiseShapes();
         this.blockWiseBound = LocalBound.of(fullShape);
+        // Fill Block Shapes
         this.splitVoxelShapePerBlock();
     }
 
@@ -134,59 +130,6 @@ public class StructShapes implements Iterable<LocalBlockPos> {
                 }
                 this.get(dir).put(localPos, rotatedShape.optimize());
             }
-        }
-    }
-
-    private static class LocalBound extends BoundingBox implements Iterable<LocalBlockPos> {
-        public LocalBound(int x1, int y1, int z1, int x2, int y2, int z2) {
-            super(x1, y1, z1, x2, y2, z2);
-        }
-
-        public LocalBound(int maxX, int maxY, int maxZ) {
-            super(0, 0, 0, maxX, maxY, maxZ);
-        }
-
-
-        @Override
-        public @NotNull Iterator<LocalBlockPos> iterator() {
-            Iterator<BlockPos> blockPosIterator = BlockPos.betweenClosed(
-                    this.minX(), this.minY(), this.minZ(),
-                    this.maxX(), this.maxY(), this.maxZ()
-            ).iterator();
-            return new AbstractIterator<>() {
-                @Override
-                protected @Nullable LocalBlockPos computeNext() {
-                    if (!blockPosIterator.hasNext())
-                        return this.endOfData();
-                    return LocalBlockPos.of(blockPosIterator.next());
-                }
-            };
-        }
-
-        /**
-         * Round Value to Half Open Range [min, max)</br>
-         * Find block index of value in between
-         * <p>
-         * Example: 3.0 -> Inside Block Index 2
-         */
-        public static int blockIndex(double value) {
-            // Value on edge need to deduct by 1
-            return Mth.floor(value) == Mth.ceil(value) ? Mth.floor(value) - 1 : Mth.floor(value);
-        }
-
-        public static LocalBound of(VoxelShape shape) {
-            return LocalBound.of(shape.bounds());
-        }
-
-        public static LocalBound of(AABB aabb) {
-            return new LocalBound(
-                    blockIndex(aabb.minX),
-                    blockIndex(aabb.minY),
-                    blockIndex(aabb.minZ),
-                    blockIndex(aabb.maxX),
-                    blockIndex(aabb.maxY),
-                    blockIndex(aabb.maxZ)
-            );
         }
     }
 }
