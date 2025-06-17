@@ -10,6 +10,7 @@ public class LocalBlockPos extends BlockPos implements LocalFrameData<LocalBlock
 
     @Override
     public LocalBlockPos faceTo(Direction dir) {
+        if (Direction.NORTH == dir) return this;
         int _x = this.getX();
         int _y = this.getY();
         int _z = this.getZ();

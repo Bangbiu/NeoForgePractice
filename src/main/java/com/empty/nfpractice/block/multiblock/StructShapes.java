@@ -14,26 +14,29 @@ import java.util.*;
 public class StructShapes implements Iterable<LocalBlockPos> {
     private final LocalBound bound;
     private final VoxelShape fullShape;
-    private final BlockWiseShapes blockShapes;
+    private final DirectionalBlockWiseShapes blockShapes;
+    private final boolean yawOnly;
 
     public StructShapes() {
         this(Shapes.box(0,0,0,2,2, 2));
     }
 
     public StructShapes(VoxelShape fullShape) {
-        this.fullShape = fullShape;
-        this.blockShapes = new BlockWiseShapes();
-        this.bound = LocalBound.of(fullShape);
-        // Fill Block Shapes
-        this.splitVoxelShapePerBlock();
+        this(fullShape, true);
     }
 
-    public VoxelShape shapeAt(LocalBlockPos localPos) {
-        return this.rotatedShapeAt(localPos, Direction.NORTH);
+    public StructShapes(VoxelShape fullShape, boolean yawOnly) {
+        this.fullShape = fullShape;
+        this.blockShapes = new DirectionalBlockWiseShapes();
+        this.bound = LocalBound.of(fullShape);
+        this.yawOnly = yawOnly;
+        // Fill Block Shapes
+        this.computeBlockWiseShapes();
     }
 
     public VoxelShape rotatedShapeAt(LocalBlockPos localPos, Direction dir) {
-        if (!this.occupied(localPos)) {
+        // Check if Block Pos Has Shape
+        if (!blockShapes.get(dir).containsKey(localPos)) {
             return Shapes.empty();
         }
         return this.blockShapes.get(dir).get(localPos);
@@ -47,20 +50,13 @@ public class StructShapes implements Iterable<LocalBlockPos> {
         return this.bound;
     }
 
-    public @NotNull boolean occupied(LocalBlockPos blockPos) {
-        if (!bound.isInside(blockPos)) {
-            return false;
-        }
-        return blockShapes.get().containsKey(blockPos);
-    }
-
     @Override
     public @NotNull Iterator<LocalBlockPos> iterator() {
         return blockShapes.get().keySet().iterator();
     }
 
-    public @NotNull Iterator<LocalBlockPos> allLocalPosFacing(Direction dir) {
-        return blockShapes.get(dir).keySet().iterator();
+    public @NotNull Iterable<LocalBlockPos> allLocalPosFacing(Direction dir) {
+        return blockShapes.get(dir).keySet();
     }
 
     /**
@@ -68,60 +64,52 @@ public class StructShapes implements Iterable<LocalBlockPos> {
      * Only Calculate the Default Shape (Facing North)</br>
      * Rotate to Fill Shape for other Direction
      */
-    public void splitVoxelShapePerBlock() {
-        Map<LocalBlockPos, List<LocalAABB>> splitMap = new HashMap<>();
-        for (AABB box : this.fullShape.toAabbs()) {
-            // Determine the range of blocks this AABB spans
-            LocalAABB localBox = LocalAABB.of(box);
-            for (Map.Entry<LocalBlockPos, LocalAABB> entry : localBox.splitPerBlock().entrySet()) {
-                splitMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
+    public void computeBlockWiseShapes() {
+        this.blockShapes.clear();
+        Direction[] directions = new Direction[]{ Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
+        if (!this.yawOnly) directions = Direction.values();
+        for (Direction dir : directions) {
+            Map<LocalBlockPos, List<LocalAABB>> splitMap = new HashMap<>();
+            for (AABB box : this.fullShape.toAabbs()) {
+                // Determine the range of blocks this AABB spans
+                LocalAABB localBox = LocalAABB.of(box).faceTo(dir);
+                for (Map.Entry<LocalBlockPos, LocalAABB> entry : localBox.splitPerBlock().entrySet()) {
+                    splitMap.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
+                }
+                NFPractice.LOGGER.info("\n Dir: {}\n{}", dir, localBox.getBound());
+            }
+            // Convert clipped boxes to voxel shapes
+            for (Map.Entry<LocalBlockPos, List<LocalAABB>> entry : splitMap.entrySet()) {
+                VoxelShape combined = Shapes.empty();
+                for (AABB box : entry.getValue()) {
+                    combined = Shapes.or(combined, Shapes.create(box));
+                }
+                this.blockShapes.register(dir, entry.getKey(), combined);
             }
         }
-        // Convert clipped boxes to voxel shapes
-        for (Map.Entry<LocalBlockPos, List<LocalAABB>> entry : splitMap.entrySet()) {
-            VoxelShape combined = Shapes.empty();
-            for (AABB box : entry.getValue()) {
-                combined = Shapes.or(combined, Shapes.create(box));
-            }
+        if (yawOnly) {
+            this.blockShapes.put(Direction.DOWN, this.blockShapes.get());
+            this.blockShapes.put(Direction.UP, this.blockShapes.get());
+        }
 
-            this.blockShapes.register(entry.getKey(), combined);
-        }
     }
 
     public static StructShapes of(VoxelShape fullShape) {
         return new StructShapes(fullShape);
     }
 
-    private static class BlockWiseShapes extends EnumMap<Direction, Map<LocalBlockPos, VoxelShape>> {
-        public BlockWiseShapes() {
+    private class DirectionalBlockWiseShapes extends EnumMap<Direction, Map<LocalBlockPos, VoxelShape>> {
+        public DirectionalBlockWiseShapes() {
             super(Direction.class);
-            this.put(Direction.NORTH, new HashMap<>());
-            this.put(Direction.SOUTH, new HashMap<>());
-            this.put(Direction.WEST, new HashMap<>());
-            this.put(Direction.EAST, new HashMap<>());
-            this.put(Direction.UP, this.get());
-            this.put(Direction.DOWN, this.get());
         }
 
         public Map<LocalBlockPos, VoxelShape> get() {
             return this.get(Direction.NORTH);
         }
 
-        public void register(LocalBlockPos localPos, VoxelShape localShape) {
-            this.get().put(localPos, localShape.optimize());
+        public void register(Direction dir, LocalBlockPos localPos, VoxelShape localShape) {
             // Register Rotated Shape
-            VoxelShape rotatedShape = Shapes.empty();
-            for (Direction dir : new Direction[] {Direction.SOUTH, Direction.WEST, Direction.EAST}) {
-                for (AABB box : localShape.toAabbs()) {
-                    LocalAABB rotatedBox = LocalAABB.of(box).faceTo(dir);
-                    if (dir == Direction.SOUTH) {
-                        NFPractice.LOGGER.info("\nboxesFrom: {}\nboxesTo{}", box, rotatedBox);
-                    }
-
-                    rotatedShape = Shapes.or(rotatedShape, Shapes.create(rotatedBox));
-                }
-                this.get(dir).put(localPos, rotatedShape.optimize());
-            }
+            this.computeIfAbsent(dir, k -> new HashMap<>()).put(localPos, localShape);
         }
     }
 }

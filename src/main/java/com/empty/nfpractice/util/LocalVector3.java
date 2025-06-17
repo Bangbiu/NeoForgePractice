@@ -9,20 +9,77 @@ public class LocalVector3 extends Vec3 implements LocalFrameData<LocalVector3> {
         super(x, y, z);
     }
 
+    /**
+     * Turning This Vector Around [0.5, 0.5, 0.5] </br>
+     * Making Vector at block [0, 0, 0] stay in the same block
+     * @param dir
+     * @return
+     */
     @Override
     public LocalVector3 faceTo(Direction dir) {
-        double _x = this.x;
-        double _y = this.y;
-        double _z = this.z;
-        switch (dir) {
-            case EAST:
-                return new LocalVector3(-_z, _y, _x); // 90 degrees CW
-            case SOUTH:
-                return new LocalVector3(-_x, _y, -_z); // 180 degrees
-            case WEST:
-                return new LocalVector3(_z, _y, -_x); // 270 degrees CW
-            default:
-                return new LocalVector3(_x, _y, _z); // no rotation
+        if (Direction.NORTH == dir) return this;
+        return this.mutable()
+                .subtract(CENTER)
+                .factTo(dir)
+                .add(CENTER)
+                .immutable();
+    }
+
+    public MutableLocalVec3 mutable() {
+        return new MutableLocalVec3(this.x, this.y, this.z);
+    }
+
+    public static final LocalVector3 CENTER = new LocalVector3(0.5, 0.5, 0.5);
+
+    public static class MutableLocalVec3 {
+        public double x, y, z;
+        public MutableLocalVec3(double x, double y, double z) {
+            this.set(x, y, z);
+        }
+
+        public MutableLocalVec3 set(double x, double y, double z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            return this;
+        }
+
+        public MutableLocalVec3 subtract(Vec3 vec) {
+            this.x -= vec.x;
+            this.y -= vec.y;
+            this.z -= vec.z;
+            return this;
+        }
+
+        public MutableLocalVec3 add(Vec3 vec) {
+            this.x += vec.x;
+            this.y += vec.y;
+            this.z += vec.z;
+            return this;
+        }
+
+        public LocalVector3 immutable() {
+            return new LocalVector3(this.x, this.y, this.z);
+        }
+
+        public MutableLocalVec3 factTo(Direction dir) {
+            switch (dir) {
+                case NORTH:
+                    return this.set(x, y, z);
+                case EAST:
+                    return this.set(-z, y, x); // 90 degrees CW
+                case SOUTH:
+                    return this.set(-x, y, -z); // 180 degrees
+                case WEST:
+                    return this.set(z, y, -x); // 270 degrees CW
+                case DOWN:
+                    return this.set(x, z, -y);
+                case UP:
+                    return this.set(x, -z, y);
+                default:
+                    return this.set(x, y, z); // no rotation
+            }
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package com.empty.nfpractice.block.entity;
 
+import com.empty.nfpractice.NFPractice;
 import com.empty.nfpractice.block.multiblock.MultiBlockPartBlock;
 import com.empty.nfpractice.util.LocalBlockPos;
 import com.empty.nfpractice.block.multiblock.MultiBlockMasterBlock;
@@ -64,7 +65,8 @@ public class MultiBlockMasterEntity extends BlockEntity {
     }
 
     public @NotNull VoxelShape getBlockShape(LocalBlockPos localPos) {
-        return this.getMultiBlockType().getShapeAt(localPos);
+        Direction dir = this.getBlockState().getValue(MultiBlockMasterBlock.FACING);
+        return this.getMultiBlockType().getRotatedShapeAt(localPos, dir);
     }
 
     public MultiBlockType getMultiBlockType() {
@@ -75,10 +77,10 @@ public class MultiBlockMasterEntity extends BlockEntity {
         Direction dir = this.getBlockState().getValue(MultiBlockMasterBlock.FACING);
         BlockPos masterWorldPos = getBlockPos();
         MultiBlockType type = this.getMultiBlockType();
-        for (LocalBlockPos localCurPos : type.shapes) {
+        for (LocalBlockPos localCurPos : type.allLocalPosFacing(dir)) {
             if (localCurPos.equals(BlockPos.ZERO))
                 continue;
-            BlockPos worldCurPos = masterWorldPos.offset(localCurPos.faceTo(dir));
+            BlockPos worldCurPos = masterWorldPos.offset(localCurPos);
             if(!comsumer.apply(localCurPos, worldCurPos))
                 return false;
         }
@@ -89,6 +91,7 @@ public class MultiBlockMasterEntity extends BlockEntity {
         BlockPos masterWorldPos = getBlockPos();
         this.forEachPartPos(
                 (localPos, worldPos) -> {
+
                     // Place Part
                     level.setBlock(worldPos, ModMultiBlock.MULTIBLOCK_DUMMY.get().defaultBlockState(), 3);
                     BlockEntity be = level.getBlockEntity(worldPos);

@@ -1,6 +1,7 @@
 package com.empty.nfpractice.block.multiblock;
 
 import com.empty.nfpractice.block.entity.MultiBlockMasterEntity;
+import com.empty.nfpractice.block.entity.MultiBlockPartEntity;
 import com.empty.nfpractice.util.LocalBlockPos;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,9 +60,9 @@ public class MultiBlockMasterBlock extends MultiBlockPartBlock {
         BlockPos masterWorldPos = ctx.getClickedPos();
         Level level = ctx.getLevel();
 
-        // This block is Master Block at (0,0,0)
-        for (LocalBlockPos localCurPos : type.shapes) {
-            BlockPos worldCurPos = masterWorldPos.offset(localCurPos.faceTo(dir));
+        // This block is Master Block at (0,0,0) Locally
+        for (LocalBlockPos localCurPos : type.allLocalPosFacing(dir)) {
+            BlockPos worldCurPos = masterWorldPos.offset(localCurPos);
             // Check if all block pos is avaliable
             if (!level.getBlockState(worldCurPos).canBeReplaced()) {
                 return null;
@@ -105,7 +107,9 @@ public class MultiBlockMasterBlock extends MultiBlockPartBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return this.getType().getMasterShape();
+        if (level.getBlockEntity(pos) instanceof MultiBlockMasterEntity entity)
+            return entity.getBlockShape(new LocalBlockPos(0,0,0));
+        return Shapes.block();
     }
 
     @Override

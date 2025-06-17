@@ -43,6 +43,7 @@ public class LocalBound extends BoundingBox implements Iterable<LocalBlockPos>, 
 
     @Override
     public LocalBound faceTo(Direction dir) {
+        if (Direction.NORTH == dir) return this;
         LocalBlockPos[] corners = {
                 new LocalBlockPos(this.minX(), this.minY(), this.minZ()),
                 new LocalBlockPos(this.maxX(), this.minY(), this.minZ()),
@@ -85,9 +86,9 @@ public class LocalBound extends BoundingBox implements Iterable<LocalBlockPos>, 
 
     public static LocalBound of(AABB aabb) {
         return new LocalBound(
-                blockIndex(aabb.minX),
-                blockIndex(aabb.minY),
-                blockIndex(aabb.minZ),
+                Mth.floor(aabb.minX),
+                Mth.floor(aabb.minY),
+                Mth.floor(aabb.minZ),
                 blockIndex(aabb.maxX),
                 blockIndex(aabb.maxY),
                 blockIndex(aabb.maxZ)
